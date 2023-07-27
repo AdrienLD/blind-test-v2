@@ -1,6 +1,7 @@
 import nodeFetch from 'node-fetch';
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
 
 const app = express();
 
@@ -21,16 +22,15 @@ app.post('/api/token', async (req, res) => {
             body: `grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:3000/callback`
         });
         const data = await response.json();
-        res.json(data);
-        accessToken = data.access_token;
+        fs.writeFileSync('.env', `ACCESS_TOKEN=${data.access_token}\n`);
     } catch (error) {
-        console.error('Erreur lors de l\'échange du code:', error);
+        console.error('Impossible de récupérer le Token Spotify : ', error);
         res.status(500).json({ error: 'Erreur lors de l\'échange du code.' });
     }
 });
 
 app.post('/api/research', async (req, res) => {
-    const {titre} = req.body
+    const { titre } = req.body
     try {
         const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}o&type=track`, {
             method: 'GET',
@@ -44,7 +44,7 @@ app.post('/api/research', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        console.error('Erreur lors de l\'échange du code:', error);
+        console.error('Impossible de rechercher la musique : ', error);
         res.status(500).json({ error: 'Erreur lors de l\'échange du code.' });
     }
 });

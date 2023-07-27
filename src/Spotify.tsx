@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const SpotifyCallback: React.FC = () => {
-    const [token, setToken] = useState<string | null>(null);
+    const accessToken = process.env.ACCESS_TOKEN;
 
     useEffect(() => {
         // Récupérer le code d'authentification de l'URL
@@ -17,10 +17,6 @@ const SpotifyCallback: React.FC = () => {
                 },
                 body: JSON.stringify({ code })
             })
-                .then(response => response.json())
-                .then(data => {
-                    setToken(data.access_token);
-                })
                 .catch(error => {
                     console.error('Erreur lors de l\'échange du code:', error);
                 });
@@ -53,7 +49,9 @@ const SpotifyCallback: React.FC = () => {
 
     return (
         <div onClick={ requireplalist}>
-            {token ? <div>Token d'accès: {token}</div> : <div>Obtention du token...</div>}
+            {accessToken ? <div>Token d'accès: {accessToken}</div> : <div>Obtention du token...</div>}
+            <iframe title='test' src="https://open.spotify.com/embed/track/2FEWcWHnDmGD6WSqpW4VYu" width="300" height="380"  allow="encrypted-media"></iframe>
+
         </div>
     );
 }
