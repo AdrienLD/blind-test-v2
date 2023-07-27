@@ -7,7 +7,7 @@ const app = express();
 app.use(cors()); // Utilisez CORS pour permettre à votre front-end de faire des requêtes vers ce serveur
 
 app.use(express.json());
-let accessToken = 'BQDs7yKVmOpF0ocnIdS8OLSGNBsOilzLOPLMIqZXTiR2pQlZXEGLvkFj2K_0ZYJsHcEh6ogCE69fTSD4-LxWDpJxoO4yKNuX7xZu-O8yLvXjYkWVcbp-407zeSyXWwjsF8gzU0UJxkN3W5DshgzkDuPTQM18kVz1KwEF4L0L8MGllstMbpQiIj-RwSzr1drI6iIxlg';
+let accessToken = 'BQDVQJaEw2hHpyUPcr8wPwNbZhKvTz0rmLHd35LtwNteL8_cyQ4dxjT1ULJtgN4ZwWOkpr2n7BUVMW-KCbr66uGdVNVkm4idZM6oHmUt6dg2zMYl-7z3usDVN5YMoMPVJhBf7IRyVsMJENC5a0aPj7v9MB3VUKJSJBxcgHvu8DUBSiWcAFevvCcP_dpVcVOY7UuLEA';
 
 app.post('/api/token', async (req, res) => {
     const { code } = req.body;
@@ -30,8 +30,9 @@ app.post('/api/token', async (req, res) => {
 });
 
 app.post('/api/research', async (req, res) => {
+    const {titre} = req.body
     try {
-        const response = await nodeFetch('https://api.spotify.com/v1/search?q=blindtest', {
+        const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}o&type=track`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -42,7 +43,6 @@ app.post('/api/research', async (req, res) => {
         }
         const data = await response.json();
         res.json(data);
-        console.log(data);
     } catch (error) {
         console.error('Erreur lors de l\'échange du code:', error);
         res.status(500).json({ error: 'Erreur lors de l\'échange du code.' });

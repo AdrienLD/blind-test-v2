@@ -28,11 +28,17 @@ const SpotifyCallback: React.FC = () => {
     }, []);
 
     const requireplalist = () => {
-        fetch('http://localhost:4000/api/research')
+        fetch('http://localhost:4000/api/research', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                titre: 'This I Love'
+            })
+        })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur avec le serveur Express');
-                }
+                console.log('response', response)
                 return response.json();
             })
             .then(data => {
