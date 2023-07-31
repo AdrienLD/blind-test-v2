@@ -4,17 +4,19 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import SpotifyCallback from './Spotify'
+import PlaylistSelection from './PlaylistSelection/PlaylistSelection'
+import Logo from './Components/Images/Songs-logo.png'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
+    <img className='logo' src={Logo} alt="logo" />
     <Router>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/callback" Component={SpotifyCallback} />
+        <Route path="/" element={<PlaylistSelection />} />
+        <Route path="/callback" Component={App} />
       </Routes>
     </Router>
   </React.StrictMode>
