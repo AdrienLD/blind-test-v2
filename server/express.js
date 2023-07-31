@@ -3,15 +3,16 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 
+
 const app = express();
 
 app.use(cors()); // Utilisez CORS pour permettre à votre front-end de faire des requêtes vers ce serveur
 
 app.use(express.json());
-let accessToken = 'BQDVQJaEw2hHpyUPcr8wPwNbZhKvTz0rmLHd35LtwNteL8_cyQ4dxjT1ULJtgN4ZwWOkpr2n7BUVMW-KCbr66uGdVNVkm4idZM6oHmUt6dg2zMYl-7z3usDVN5YMoMPVJhBf7IRyVsMJENC5a0aPj7v9MB3VUKJSJBxcgHvu8DUBSiWcAFevvCcP_dpVcVOY7UuLEA';
 
 app.post('/api/token', async (req, res) => {
     const { code } = req.body;
+
     try {
         const response = await nodeFetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
@@ -22,7 +23,11 @@ app.post('/api/token', async (req, res) => {
             body: `grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:3000/callback`
         });
         const data = await response.json();
-        fs.writeFileSync('.env', `ACCESS_TOKEN=${data.access_token}\n`);
+        if (process.env.TOKEN === undefined) {
+            fs.writeFileSync('.env', `TOKEN=${data.access_token}\n`);
+        }
+        console.log('TOKEN : ', data.access_token, process.env.TOKEN);
+
     } catch (error) {
         console.error('Impossible de récupérer le Token Spotify : ', error);
         res.status(500).json({ error: 'Erreur lors de l\'échange du code.' });
@@ -31,16 +36,14 @@ app.post('/api/token', async (req, res) => {
 
 app.post('/api/research', async (req, res) => {
     const { titre } = req.body
+    console.log('ACCESS TOKEN : ', process.env.TOKEN);
     try {
-        const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}o&type=track`, {
+        const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=track`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
             }
-        });
-        if (!response.ok) {
-            throw new Error('Erreur avec l\'API Spotify');
-        }
+        })
         const data = await response.json();
         res.json(data);
     } catch (error) {

@@ -30,7 +30,7 @@ const SpotifyCallback: React.FC = () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                titre: 'This I Love'
+                titre: 'Gagnam style'
             })
         })
             .then(response => {
