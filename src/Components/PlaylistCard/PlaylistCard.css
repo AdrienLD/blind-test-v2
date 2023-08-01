@@ -19,3 +19,9 @@
     text-align: center;
     margin-top: 10px;
 }
+
+.logoplaylist{
+    width: 70%;
+    margin: 5px auto;
+  display: block;
+}

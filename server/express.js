@@ -67,8 +67,6 @@ async function testAccessToken() {
 
 app.post('/api/research', async (req, res) => {
     const { titre, type } = req.body
-    console.log("ici")
-    
     if (process.env.TOKEN === undefined) await getAccessToken()
     await testAccessToken()
     try {
@@ -87,7 +85,6 @@ app.post('/api/research', async (req, res) => {
 })
 
 app.post('/api/tracks', async (req, res) => {
-    console.log("ici2")
     const { playlistId } = req.body
     if (process.env.TOKEN === undefined) await getAccessToken()
     try {

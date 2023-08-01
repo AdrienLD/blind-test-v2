@@ -1,9 +1,10 @@
 import React from 'react';
 import PlaylistCard, { PlaylistCardProps } from '../Components/PlaylistCard/PlaylistCard';
 import './PlaylistSelection.css';
+import { useNavigate } from 'react-router-dom';
 
 
-interface Musique {
+export interface Musique {
     titre: string;
     artiste: string;
     album: string;
@@ -12,16 +13,14 @@ interface Musique {
 }
 
 const PlaylistSelection: React.FC = () => {
-    const playlistsPossibles: PlaylistCardProps[] = [
-        {
-            nom: 'Playlist 1',
-            choisie: false
-        },
-        {
-            nom: 'Playlist 2',
-            choisie: false
-        }
-    ];
+    const navigate = useNavigate();
+    const playlistNames = ['Années 50', 'Années 60', 'Années 70', 'Années 80', 'Années 90', 'Années 2000', 'Années 2010', 'Années 2020', 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde', 'Films', 'Jeu Vidéo', 'Dessin animés', 'Séries', 'Pub']
+
+    const [playlistsPossibles, setPlaylistsPossibles] = React.useState<PlaylistCardProps[]>(playlistNames.map((name) => ({
+        nom: name,
+        choisie: false,
+        onClick: () => {} // Ceci sera mis à jour plus tard
+    })));
 
     function shuffle(array: Musique[]) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -34,7 +33,42 @@ const PlaylistSelection: React.FC = () => {
         return array;
     }
 
-    const requireplalist = async () => {
+    function balanceArrays(playlists: Musique[][]) {
+        const minLength = Math.min(...playlists.map(subArr => subArr.length));
+        playlists = playlists.map(subArr => shuffle(subArr));
+        
+        playlists.forEach((playlist) => {
+            while (playlist.length > minLength) {
+                const randomIndex = Math.floor(Math.random() * playlist.length);
+                playlist.splice(randomIndex, 1);
+            }
+        })
+
+        let flattened = playlists.reduce((acc, curr) => acc.concat(curr), [])
+        flattened = shuffle(flattened);
+
+        let playlistmelange: Musique[] = [];
+
+        while (flattened.length) {
+            const randomIndex = Math.floor(Math.random() * flattened.length);
+            playlistmelange.push(flattened[randomIndex]);
+            flattened.splice(randomIndex, 1);
+        }
+        playlistmelange = shuffle(playlistmelange);
+        return playlistmelange;
+      }
+
+    const reverseChoix = (index: number) => {
+        const newPlaylists = [...playlistsPossibles];
+        newPlaylists[index].choisie = !newPlaylists[index].choisie;
+        setPlaylistsPossibles(newPlaylists);
+    }
+
+    playlistsPossibles.forEach((playlist, index) => {
+        playlist.onClick = () => reverseChoix(index);
+    })
+
+    const requireplalist = async (titre: string) => {
         try {
             const response = await fetch('http://localhost:4000/api/research', {
                 method: 'POST',
@@ -42,7 +76,7 @@ const PlaylistSelection: React.FC = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    titre: 'voiture',
+                    titre: titre,
                     type: 'playlist'
                 })
             });
@@ -79,7 +113,35 @@ const PlaylistSelection: React.FC = () => {
         }
     }
 
-    const listemusiques = async () => {
+    const extractmusique = async () => {
+        const playlistSelection: string[] = [];
+        playlistsPossibles.forEach(async (playlist) => {
+            if (playlist.choisie) {
+                playlistSelection.push(playlist.nom);
+            }
+        })
+        let playlistComplete: Musique[][] = [];
+        for (let index = 0; index < playlistSelection.length; index++) {
+            const playlist = playlistSelection[index];
+            const playlistId = await requireplalist(playlist);
+            const musiques = await extractmusiques(playlistId.playlists.items[1].id);
+            playlistComplete.push([]);
+            musiques.items.forEach((element: { track: { name: any; artists: { name: any; }[]; album: { name: any; }; id: any; }; }) => {
+                playlistComplete[index].push({
+                    titre: element.track.name,
+                    artiste: element.track.artists.map(artist => artist.name).join(', '),
+                    album: element.track.album.name,
+                    id: element.track.id,
+                    playlist: playlist
+                })
+            })
+        }
+        const playlistFinale: Musique[] = balanceArrays(playlistComplete)
+        console.log('playlistFinale', playlistFinale);
+        navigate('/BlindGame', { state: { playlist: playlistFinale } });
+    }
+
+    /*const listemusiques = async () => {
         const listeMusiques: Musique[] = [];
         console.log('listemusiques');
         const playlist = await requireplalist();
@@ -98,10 +160,10 @@ const PlaylistSelection: React.FC = () => {
         });
         shuffle(listeMusiques)
 
-    }
+    }*/
 
     return (
-        <div className='PlaylistSelection' onClick={listemusiques}>
+        <div className='PlaylistSelection'>
             <div className="TitreChoix">
                  Choisissez les playlists que vous voulez avoir dans votre BlindTest
             </div>
@@ -113,6 +175,10 @@ const PlaylistSelection: React.FC = () => {
                         )
                     })
                 }
+            </div>
+            <div className="Validations">
+                <button onClick={() => extractmusique()}>S'entrainer</button>
+                <button>Jouer</button>
             </div>
 
 
