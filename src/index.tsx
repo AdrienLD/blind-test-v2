@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PlaylistSelection from './PlaylistSelection/PlaylistSelection'
 import Logo from './Components/Images/Songs-logo.png'
 import BlindGame from './BlindGame/BlindGame';
+import CallBack from './Components/CallBack';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,7 +18,7 @@ root.render(
     <Router>
       <Routes>
         <Route path="/" element={<PlaylistSelection />} />
-        <Route path="/callback" Component={App} />
+        <Route path="/callback" element={<CallBack/>} />
         <Route path="/BlindGame" element={<BlindGame/>} />
       </Routes>
     </Router>
