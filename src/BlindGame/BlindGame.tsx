@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Musique } from '../PlaylistSelection/PlaylistSelection';
-import ReactDOM from "react-dom/client";
-import SpotifyPlayer from 'react-spotify-web-playback';
 
 function BlindGame() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
@@ -23,7 +21,7 @@ function BlindGame() {
         console.log('tokenici', token);
         try {
 
-            const response = await fetch('http://localhost:4000/api/getplayeratate', {
+            const response = await fetch('http://localhost:4000/api/getplayerstate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
