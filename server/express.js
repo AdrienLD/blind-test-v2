@@ -40,7 +40,6 @@ async function getAccessToken() {
 
 app.post('/api/gettoken', async (req, res) => {
     const code = req.body.code
-    
     const params = new URLSearchParams();
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
@@ -59,7 +58,7 @@ app.post('/api/gettoken', async (req, res) => {
         });
         
         const data = await response.json();
-        console.log('\ndata', data.access_token)
+        console.log('\ndata', data)
         if (data.access_token)res.json({ access_token: data.access_token })
 
     } catch (error) {
@@ -117,14 +116,39 @@ app.post('/api/play', async (req, res) => {
     });
 })
 
-app.post('/api/getplayerstate', async (req, res) => {
-    const { token } = req.body.token
-    console.log('token', token)
+app.get('/api/getplayerstate', async (req, res) => {
+    const token = req.headers.token
     try {
         const response = await fetch('https://api.spotify.com/v1/me/player', {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Spotify API responded with status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching player state:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/api/playpause', async (req, res) => {
+    const token = req.headers.token
+    const commande = req.headers.command
+    const method = req.headers.method
+    console.log('commande', commande)
+    console.log('method', method)
+    try {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/${commande}`, {
+            method: method,
+            headers: {
                 'Authorization': `Bearer ${token}`
             }
         });

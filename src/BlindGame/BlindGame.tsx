@@ -16,31 +16,31 @@ function BlindGame() {
         }
     }
 
-    async function getplayerstate() {
+    async function getpause(commande: string, method: string) {
         const token = localStorage.getItem('token')!
-        console.log('tokenici', token);
         try {
-
-            const response = await fetch('http://localhost:4000/api/getplayerstate', {
-                method: 'POST',
+            await fetch('http://localhost:4000/api/playpause', {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    token: token
-                })
+                    'Content-Type': 'application/json',
+                    token: token,
+                    command: commande,
+                    method: method
+                }
             });
-
-            console.log('response', response);
-            const data = await response.json();
-            console.log(data);
-            return data;  // Retourner les données reçues
         } catch (error) {
             console.error('Erreur lors de l\'échange du code:', error);
             throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
         }
     }
-    getplayerstate();
+
+    const loop = async () => {
+        await getpause('pause', 'PUT')
+        await getpause(`queue?uri=spotify%3Atrack%3A4iV5W9uYEdYUVa79Axb7Rh`, 'POST')
+        await getpause('next', 'POST')
+        await getpause('play', 'PUT')
+    }
+    loop()
 
 
     const token = localStorage.getItem('token')!;

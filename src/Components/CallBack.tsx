@@ -113,7 +113,7 @@ function CallBack() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    token: localStorage.getItem('token')
+                    code: window.location.search.split('=')[1]
                 })
             });
             const data = await response.json();
