@@ -1,14 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Musique } from '../PlaylistSelection/PlaylistSelection';
 
-
-export interface Musique {
-    titre: string;
-    artiste: string;
-    album: string;
-    id: string;
-    playlist: string;
-}
 
 function CallBack() {
     const navigate = useNavigate();
@@ -128,7 +121,7 @@ function CallBack() {
 
     const extractmusique = async () => {
         await console.log('extractmusique');
-        gettoken()
+        await gettoken()
         const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]');
         console.log('playlistsPossibles', playlistSelection);
         const token = localStorage.getItem('token')
@@ -145,7 +138,8 @@ function CallBack() {
                     artiste: element.track.artists.map(artist => artist.name).join(', '),
                     album: element.track.album.name,
                     id: element.track.id,
-                    playlist: playlist
+                    playlist: playlist,
+                    playlistimg: playlistId.playlists.items[1].images[0].url
                 })
             })
         }

@@ -1,9 +1,12 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import VisuelQuestion from '../Components/VisuelQuestion/VisuelQuestion';
 import { Musique } from '../PlaylistSelection/PlaylistSelection';
+import './BlindGame.css'
 
 function BlindGame() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
+    const [montrerReponse, setMontrerReponse] = React.useState(true); 
     const location = useLocation();
     const receivedData: Musique[] = location.state?.playlist;
 
@@ -29,25 +32,24 @@ function BlindGame() {
                 }
             });
         } catch (error) {
-            console.error('Erreur lors de l\'échange du code:', error);
-            throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
+            console.error('Erreur lors de l\'échange du code:', error)
+            throw error
         }
     }
 
     const loop = async () => {
         await getpause('pause', 'PUT')
-        await getpause(`queue?uri=spotify%3Atrack%3A4iV5W9uYEdYUVa79Axb7Rh`, 'POST')
+        await getpause('queue?uri=spotify%3Atrack%3A4iV5W9uYEdYUVa79Axb7Rh', 'POST')
         await getpause('next', 'POST')
         await getpause('play', 'PUT')
     }
-    loop()
-
-
-    const token = localStorage.getItem('token')!;
-    console.log('token', token);
 
     return (
         <div>
+            <h1>BlindGame Musique : {musiqueActuelle}</h1>
+            {
+                montrerReponse ? <VisuelQuestion {...receivedData[musiqueActuelle]}/> : <p> test</p>
+            }
         </div>
     );
 }

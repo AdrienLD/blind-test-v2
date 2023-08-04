@@ -1,0 +1,16 @@
+.VisuelQuestion {
+  display: flex;
+}
+
+.PochetteAlbum {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #000;
+  float: left;
+}
+
+.TitrePlaylist {
+  float: right;
+}

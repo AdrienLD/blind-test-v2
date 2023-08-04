@@ -9,6 +9,7 @@ export interface Musique {
     album: string;
     id: string;
     playlist: string;
+    playlistimg: string;
 }
 
 const PlaylistSelection: React.FC = () => {
