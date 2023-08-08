@@ -98,6 +98,7 @@ function CallBack() {
     }
 
     async function gettoken() {
+        localStorage.setItem('access_code', window.location.search.split('=')[1]);
         try {
             
             const response = await fetch('http://localhost:4000/api/gettoken', {
@@ -132,11 +133,12 @@ function CallBack() {
             const playlistId = await requireplalist(playlist);
             const musiques = await extractmusiques(playlistId.playlists.items[1].id);
             playlistComplete.push([]);
-            musiques.items.forEach((element: { track: { name: any; artists: { name: any; }[]; album: { name: any; }; id: any; }; }) => {
+            musiques.items.forEach((element: ) => {
                 playlistComplete[index].push({
                     titre: element.track.name,
                     artiste: element.track.artists.map(artist => artist.name).join(', '),
                     album: element.track.album.name,
+                    albumimg: element.track.images[0].url,
                     id: element.track.id,
                     playlist: playlist,
                     playlistimg: playlistId.playlists.items[1].images[0].url

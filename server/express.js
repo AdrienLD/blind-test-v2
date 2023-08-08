@@ -67,6 +67,24 @@ app.post('/api/gettoken', async (req, res) => {
     }
 })
 
+app.get('/api/testtoken', async (req, res) => {
+    const token = req.headers.token
+    try {
+        const response = await fetch('https://api.spotify.com/v1/me/player', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching player state:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.post('/api/research', async (req, res) => {
     const { titre, type, token } = req.body

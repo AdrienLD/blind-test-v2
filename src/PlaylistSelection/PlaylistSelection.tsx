@@ -7,6 +7,7 @@ export interface Musique {
     titre: string;
     artiste: string;
     album: string;
+    albumimg: string;
     id: string;
     playlist: string;
     playlistimg: string;
