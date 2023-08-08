@@ -3,10 +3,11 @@ import './Countdown.css';
 
 interface props {
     onFinish: () => void;
+    timer: number;
 }
 
 function Countdown(props: any) {
-    const [timeLeft, setTimeLeft] = useState(2);
+    const [timeLeft, setTimeLeft] = useState(props.timer);
     const [millisecondsLeft, setMillisecondsLeft] = useState(1000);
     const circumference = 2 * Math.PI * 70; // Rayon de 70
     const strokeDashoffset = (millisecondsLeft / 1000) * circumference;
@@ -17,11 +18,10 @@ function Countdown(props: any) {
                 setMillisecondsLeft(millisecondsLeft - 10);
             }, 10); // On diminue toutes les 10 millisecondes pour une précision plus grande
             return () => clearTimeout(timer);
-        } else {
-            if (timeLeft === 0) props.onFinish();
+        } else if (timeLeft > 0){
             setTimeLeft(timeLeft - 1);
             setMillisecondsLeft(1000);
-        }
+        } else {if (timeLeft === 0) props.onFinish();}
     }, [millisecondsLeft, timeLeft, props]);
 
     return (

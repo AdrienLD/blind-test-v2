@@ -169,11 +169,7 @@ app.get('/api/playpause', async (req, res) => {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Spotify API responded with status: ${response.status}`);
-        }
+        })
 
         const data = await response.json();
 

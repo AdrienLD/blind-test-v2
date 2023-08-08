@@ -132,13 +132,14 @@ function CallBack() {
             const playlist = playlistSelection[index];
             const playlistId = await requireplalist(playlist);
             const musiques = await extractmusiques(playlistId.playlists.items[1].id);
+            console.log('musiques', musiques);
             playlistComplete.push([]);
-            musiques.items.forEach((element: ) => {
+            musiques.items.forEach((element: { track: { name: any; artists: { name: any; }[]; album: { name: any; images: any; }; id: any; }; }) => {
                 playlistComplete[index].push({
                     titre: element.track.name,
                     artiste: element.track.artists.map(artist => artist.name).join(', '),
                     album: element.track.album.name,
-                    albumimg: element.track.images[0].url,
+                    albumimg: element.track.album.images[0].url,
                     id: element.track.id,
                     playlist: playlist,
                     playlistimg: playlistId.playlists.items[1].images[0].url

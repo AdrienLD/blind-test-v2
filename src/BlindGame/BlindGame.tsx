@@ -10,15 +10,6 @@ function BlindGame() {
     const location = useLocation();
     const receivedData: Musique[] = location.state?.playlist;
 
-    const goToNextMusique = () => {
-        if (musiqueActuelle < receivedData.length - 1) { // Pour éviter de dépasser la liste
-            setMusiqueActuelle(prevMusique => prevMusique + 1);
-        } else {
-            console.log("C'est la dernière piste.");
-            // Ici, vous pouvez gérer ce qui se passe après la dernière piste, comme rediriger vers une autre page ou afficher un message.
-        }
-    }
-
     async function getpause(commande: string, method: string) {
         const token = localStorage.getItem('token')!
         try {
@@ -113,6 +104,13 @@ function BlindGame() {
         await setAffichage(3)
     }
 
+    const nextmusique = async () => {
+        await testtoken()
+        await getpause('pause', 'PUT')
+        setMusiqueActuelle(musiqueActuelle + 1)
+        setAffichage(0)
+    }
+
 
     return (
         <div>
@@ -123,7 +121,7 @@ function BlindGame() {
                         <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
                         <div className="infos">
                             <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
-                            {affichage === 0 ? <Countdown onFinish={startmusique}/> :
+                            {affichage === 0 ? <Countdown onFinish={startmusique} timer={0}/> :
                                 affichage === 1 ? 
                                 <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
                                     <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
@@ -137,18 +135,14 @@ function BlindGame() {
                         </div>
                     </div> :
                     <div className='VisuelQuestion'>
-                    <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
+                    <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
                     <div className="infos">
-                        <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
-                        {affichage === 0 ? <Countdown onFinish={startmusique}/> :
-                            affichage === 1 ? 
-                            <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
-                                <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
-                                Votre navigateur ne prend pas en charge la balise vidéo.
-                            </video> :
+                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
+                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].artiste}</p>
+                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].album}</p>
+                        {
                             <div>
-                                <button onClick={moreTime}>+ de temps</button>
-                                <button onClick={response}>Réponse</button>
+                                <button onClick={nextmusique}>Musique suivante</button>
                             </div>
                         }
                     </div>
