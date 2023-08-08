@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Countdown.css';
 
-interface props {
-    onFinish: () => void;
-    timer: number;
-}
-
 function Countdown(props: any) {
     const [timeLeft, setTimeLeft] = useState(props.timer);
     const [millisecondsLeft, setMillisecondsLeft] = useState(1000);

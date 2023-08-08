@@ -13,31 +13,6 @@ app.use(express.json());
 const CLIENT_ID = 'bbbe51c137b24687a4edb6c27fbb5dac'
 const CLIENT_SECRET = '58db67382ecf4533a02aabbcd71ae60d'
 
-async function getAccessToken() {
-    const params = new URLSearchParams();
-    params.append('grant_type', 'client_credentials')
-    const headers = {
-        'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-    try {
-        const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            body: params,
-            headers: headers
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            throw new Error(`Error from Spotify: ${data.error_description}`);
-        }
-    } catch (error) {
-        console.error('Error fetching access token:', error.message)
-        return null
-    }
-}
-
 app.post('/api/gettoken', async (req, res) => {
     const code = req.body.code
     const params = new URLSearchParams();

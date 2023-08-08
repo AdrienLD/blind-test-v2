@@ -8,7 +8,8 @@ function CallBack() {
 
     React.useEffect(() => {
         extractmusique();
-    }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function shuffle(array: Musique[]) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -124,15 +125,11 @@ function CallBack() {
         await console.log('extractmusique');
         await gettoken()
         const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]');
-        console.log('playlistsPossibles', playlistSelection);
-        const token = localStorage.getItem('token')
-        console.log('token', token);        
         let playlistComplete: Musique[][] = [];
         for (let index = 0; index < playlistSelection.length; index++) {
             const playlist = playlistSelection[index];
             const playlistId = await requireplalist(playlist);
             const musiques = await extractmusiques(playlistId.playlists.items[1].id);
-            console.log('musiques', musiques);
             playlistComplete.push([]);
             musiques.items.forEach((element: { track: { name: any; artists: { name: any; }[]; album: { name: any; images: any; }; id: any; }; }) => {
                 playlistComplete[index].push({

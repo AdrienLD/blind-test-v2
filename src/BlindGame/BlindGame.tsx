@@ -70,13 +70,6 @@ function BlindGame() {
         }
     }
 
-    const loop = async () => {
-        await getpause('pause', 'PUT')
-        await getpause('queue?uri=spotify%3Atrack%3A4iV5W9uYEdYUVa79Axb7Rh', 'POST')
-        await getpause('next', 'POST')
-        await getpause('play', 'PUT')
-    }
-
     const startmusique = async () => {
         await testtoken()
         await getpause('pause', 'PUT')
