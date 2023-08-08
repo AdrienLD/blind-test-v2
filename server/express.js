@@ -52,9 +52,12 @@ app.get('/api/testtoken', async (req, res) => {
             }
         });
 
-        const data = await response.json();
+        if (response){
+            console.log('response', response)
 
-        res.json(data);
+            res.json({ response })
+        }
+        
     } catch (error) {
         console.error('Error fetching player state:', error);
         res.status(500).send('Internal Server Error');
