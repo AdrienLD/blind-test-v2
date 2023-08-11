@@ -129,7 +129,7 @@ function CallBack() {
         for (let index = 0; index < playlistSelection.length; index++) {
             const playlist = playlistSelection[index];
             const playlistId = await requireplalist(playlist);
-            const musiques = await extractmusiques(playlistId.playlists.items[1].id);
+            const musiques = await extractmusiques(playlistId.playlists.items[0].id);
             playlistComplete.push([]);
             musiques.items.forEach((element: { track: { name: any; artists: { name: any; }[]; album: { name: any; images: any; }; id: any; }; }) => {
                 playlistComplete[index].push({
@@ -139,7 +139,7 @@ function CallBack() {
                     albumimg: element.track.album.images[0].url,
                     id: element.track.id,
                     playlist: playlist,
-                    playlistimg: playlistId.playlists.items[1].images[0].url
+                    playlistimg: playlistId.playlists.items[0].images[0].url
                 })
             })
         }

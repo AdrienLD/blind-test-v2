@@ -7,8 +7,13 @@ import Countdown from '../Components/VisuelQuestion/Countdown/Countdown';
 function BlindGame() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
     const [affichage, setAffichage] = React.useState(0);
+    const [entrainement, setEntrainement] = React.useState(false)
     const location = useLocation();
     const receivedData: Musique[] = location.state?.playlist;
+
+    function sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function getpause(commande: string, method: string) {
         const token = localStorage.getItem('token')!
@@ -31,7 +36,7 @@ function BlindGame() {
     async function gettoken() {
         const code = localStorage.getItem('access_code');
         try {
-            
+
             const response = await fetch('http://localhost:4000/api/gettoken', {
                 method: 'POST',
                 headers: {
@@ -44,7 +49,7 @@ function BlindGame() {
             const data = await response.json();
             await console.log('responseAdrien', data);
             await localStorage.setItem('token', data.access_token);
-            
+
         } catch (error) {
             console.error('Erreur lors de l\'échange du code:', error);
             throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
@@ -71,11 +76,15 @@ function BlindGame() {
 
     const startmusique = async () => {
         await testtoken()
-        await getpause('pause', 'PUT')
         await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
+        await sleep(100)
         await getpause('next', 'POST')
-        await getpause('play', 'PUT')
-        await setAffichage(1)
+        if (!entrainement) {
+            await setAffichage(1)
+        } else {
+            await sleep(20000)
+            await endTimer()
+        }
     }
 
     const moreTime = async () => {
@@ -87,13 +96,31 @@ function BlindGame() {
     const endTimer = async () => {
         await testtoken()
         await getpause('pause', 'PUT')
-        setAffichage(2)
+        if (!entrainement) {
+            setAffichage(2)
+        } else {
+            console.log('entrainement')
+            await response()
+        }
     }
 
     const response = async () => {
-        await testtoken()
-        await getpause('play', 'PUT')
+        if (!entrainement) {
+            await testtoken()
+            await getpause('play', 'PUT')
+
+        } else {
+            const utterance = new SpeechSynthesisUtterance(`${receivedData[musiqueActuelle].titre} de ${receivedData[musiqueActuelle].artiste}`);
+            const allVoices = window.speechSynthesis.getVoices();
+            const frenchVoices = allVoices.filter(voice => voice.lang.startsWith('fr-FR'));
+            utterance.voice = frenchVoices[8];
+            utterance.rate = 0.5;
+            await window.speechSynthesis.speak(utterance);
+            await sleep(3000)
+            await nextmusique()
+        }
         await setAffichage(3)
+
     }
 
     const nextmusique = async () => {
@@ -113,32 +140,32 @@ function BlindGame() {
                         <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
                         <div className="infos">
                             <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
-                            {affichage === 0 ? <Countdown onFinish={startmusique} timer={0}/> :
-                                affichage === 1 ? 
-                                <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
-                                    <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
-                                    Votre navigateur ne prend pas en charge la balise vidéo.
-                                </video> :
-                                <div>
-                                    <button onClick={moreTime}>+ de temps</button>
-                                    <button onClick={response}>Réponse</button>
-                                </div>
+                            {affichage === 0 ? <Countdown onFinish={startmusique} timer={0} /> :
+                                affichage === 1 ?
+                                    <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
+                                        <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
+                                        Votre navigateur ne prend pas en charge la balise vidéo.
+                                    </video> :
+                                    <div>
+                                        <button onClick={moreTime}>+ de temps</button>
+                                        <button onClick={response}>Réponse</button>
+                                    </div>
                             }
                         </div>
                     </div> :
                     <div className='VisuelQuestion'>
-                    <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
-                    <div className="infos">
-                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
-                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].artiste}</p>
-                        <p className='TitrePlaylist'>{receivedData[musiqueActuelle].album}</p>
-                        {
-                            <div>
-                                <button onClick={nextmusique}>Musique suivante</button>
-                            </div>
-                        }
+                        <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
+                        <div className="infos">
+                            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
+                            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].artiste}</p>
+                            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].album}</p>
+                            {
+                                <div>
+                                    <button onClick={nextmusique}>Musique suivante</button>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
             }
         </div>
     );
