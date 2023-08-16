@@ -33,7 +33,6 @@ app.post('/api/gettoken', async (req, res) => {
         });
         
         const data = await response.json();
-        console.log('\ndata', data)
         if (data.access_token)res.json({ access_token: data.access_token })
 
     } catch (error) {
@@ -53,8 +52,6 @@ app.get('/api/testtoken', async (req, res) => {
         });
 
         if (response){
-            console.log('response', response)
-
             res.json({ response })
         }
         
@@ -139,8 +136,6 @@ app.get('/api/playpause', async (req, res) => {
     const token = req.headers.token
     const commande = req.headers.command
     const method = req.headers.method
-    console.log('commande', commande)
-    console.log('method', method)
     try {
         const response = await fetch(`https://api.spotify.com/v1/me/player/${commande}`, {
             method: method,

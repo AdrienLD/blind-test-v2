@@ -79,6 +79,7 @@ function BlindGame() {
         await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
         await sleep(100)
         await getpause('next', 'POST')
+        await sleep(5000)
         if (!entrainement) {
             await setAffichage(1)
         } else {
