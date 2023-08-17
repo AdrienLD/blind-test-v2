@@ -144,8 +144,10 @@ function CallBack() {
             })
         }
         const playlistFinale: Musique[] = balanceArrays(playlistComplete)
-        console.log('playlistFinale', playlistFinale);
-        navigate('/BlindGame', { state: { playlist: playlistFinale } });
+        console.log('playlistFinale', playlistFinale)
+        const mode = localStorage.getItem('mode')
+        mode === 'blind' ? navigate('/BlindGame', { state: { playlist: playlistFinale } }) :
+        navigate('/PLParoles', { state: { playlist: playlistFinale } });
     }
 
     return (

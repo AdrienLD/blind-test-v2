@@ -154,6 +154,23 @@ app.get('/api/playpause', async (req, res) => {
 });
 
 
+app.get('/api/getlyricsId', async (req, res) => {
+    const apikey = req.headers.apikey
+    const titre = req.headers.titre
+    const artiste = req.headers.artiste
+    try {
+        const response = await fetch(`https://api.musixmatch.com/ws/1.1/track.search?q_track=${titre}&q_artist=${artiste}&apikey=${apikey}`, {
+            method: 'GET'
+        })
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching player state:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 app.listen(4000, () => {
     console.log('Serveur démarré (port 4000)');
 });

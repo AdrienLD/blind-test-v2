@@ -36,7 +36,8 @@ const PlaylistSelection: React.FC = () => {
 
 
 
-    const extractmusique = async () => {
+    const extractmusique = async (mode: string) => {
+        localStorage.setItem('mode', mode);
         const PlaylistSelection = playlistsPossibles.filter((playlist) => playlist.choisie).map((playlist) => playlist.nom);
         await localStorage.setItem('playlists', JSON.stringify(PlaylistSelection))
         const SCOPES = [
@@ -45,11 +46,6 @@ const PlaylistSelection: React.FC = () => {
             "user-modify-playback-state",
             "user-read-currently-playing",
             "streaming",
-            "app-remote-control",
-            "user-read-email",
-            "user-read-private",
-            "playlist-read-collaborative"
-
         ];
         const REDIRECT_URI = 'http://localhost:3000/callback';
 
@@ -71,8 +67,8 @@ const PlaylistSelection: React.FC = () => {
                 }
             </div>
             <div className="Validations">
-                <button onClick={() => extractmusique()}>S'entrainer</button>
-                <button>Jouer</button>
+                <button onClick={() => extractmusique('blind')}>Blind Test</button>
+                <button onClick={() => extractmusique('nplp')}>N'Oubliez Pas Les Paroles</button>
             </div>
 
 

@@ -8,6 +8,7 @@ import PlaylistSelection from './PlaylistSelection/PlaylistSelection'
 import Logo from './Components/Images/Songs-logo.png'
 import BlindGame from './BlindGame/BlindGame';
 import CallBack from './Components/CallBack';
+import PLParoles from './PLParoles/PLParoles';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,6 +21,7 @@ root.render(
         <Route path="/" element={<PlaylistSelection />} />
         <Route path="/callback" element={<CallBack/>} />
         <Route path="/BlindGame" element={<BlindGame/>} />
+        <Route path='/PLParoles' element={<PLParoles/>} />
       </Routes>
     </Router>
   </React.StrictMode>
