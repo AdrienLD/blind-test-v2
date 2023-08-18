@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Musique } from '../PlaylistSelection/PlaylistSelection';
 import './PLParoles.css'
 import Countdown from '../Components/VisuelQuestion/Countdown/Countdown';
+import LyricsClient from "sync-lyrics"
 
 function PLParoles() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
@@ -68,9 +69,28 @@ function PLParoles() {
                 }
             });
             const data = await response.json();
-            await console.log('lyrics', data);
-            await localStorage.setItem('token', data.access_token);
+            let i = 0
+            while (data.message.body.track_list[i].track.has_lyrics === 0) {
+                i++
+                if (i === data.message.body.track_list.length) {
+                    console.log('pas de lyrics')
+                    break
+                }
+            }
+            console.log('richsyng', data.message.body.track_list[i].track.has_richsync)
+            await console.log('lyricssonbgs', data, data.message.body.track_list[i].track.track_id);
+            const lyrics = await fetch('http://localhost:4000/api/getlyrics', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    apikey: 'f3c6b3987f2930fd77d65aace3e556e1',
+                    track_id: receivedData[musiqueActuelle].id
+                }
+            });
+            const final = await lyrics.json();
+            await console.log('lyrics', final);
 
+           
         } catch (error) {
             console.error('Erreur lors de l\'échange du code:', error);
             throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
@@ -98,6 +118,7 @@ function PLParoles() {
     const startmusique = async () => {
         await testtoken()
         await getlyricsId()
+        
         await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
         await sleep(100)
         await getpause('next', 'POST')
@@ -135,6 +156,7 @@ function PLParoles() {
     return (
         <div>
             <h1>N'Oubliez pas les Paroles !</h1>
+            <script type="text/javascript" src="https://tracking.musixmatch.com/t1.0/m_img/e_1/sn_0/l_19915235/su_0/rs_0/tr_3vUCADZOeQ2EJZus_nq7GH01wP79qOxU-KWYz3bsrUtZ9_14VvzJM6e48M0i-V0_D17XhCqc4KoDkUTfWRWrFSa3ZRaeS8-UkymCNQntabWoeSZQMic7SuKwzoSLsBh6LeQ5TrPqTkzuDNDqlPb547uzG1-aOSdsrOAfM4z4EO-6phAf-Xs2Z1fA_hwVGTxahZ8VIecsHnQOvQLuq4uE7ku1I8ez_jQUBIiFV1dFepqUOA3D0hFVtd2VXbwurF4-MYtYkReTr5bjcDFwe6NV2HQvBuD0ddXwtpH4IE9mnnnNGHDp85eEVlCegDKHyM1hpH-qWERgcPkM8n1kKM13sJAU2Qw5tbTxoyhYI96pMLYoGG_8qV2MRHj8lI7mMTlLVPn_LD3VMqUlXV6UXtFNUsxEC75iLSGQcJp_/"></script>
             {
                 affichage <= 2 ?
                     <div className='VisuelQuestion'>

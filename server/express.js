@@ -2,7 +2,7 @@ import nodeFetch from 'node-fetch';
 import express from 'express';
 import cors from 'cors';
 import { URLSearchParams } from 'url';
-
+import LyricsClient from "sync-lyrics";
 
 const app = express();
 
@@ -31,9 +31,9 @@ app.post('/api/gettoken', async (req, res) => {
             body: params,
             headers: headers
         });
-        
+
         const data = await response.json();
-        if (data.access_token)res.json({ access_token: data.access_token })
+        if (data.access_token) res.json({ access_token: data.access_token })
 
     } catch (error) {
         console.error('Error fetching access token:', error.message);
@@ -51,10 +51,10 @@ app.get('/api/testtoken', async (req, res) => {
             }
         });
 
-        if (response){
+        if (response) {
             res.json({ response })
         }
-        
+
     } catch (error) {
         console.error('Error fetching player state:', error);
         res.status(500).send('Internal Server Error');
@@ -168,6 +168,16 @@ app.get('/api/getlyricsId', async (req, res) => {
         console.error('Error fetching player state:', error);
         res.status(500).send('Internal Server Error');
     }
+});
+
+app.get('/api/getlyrics', async (req, res) => {
+    const apikey = req.headers.apikey
+    const titre_id = req.headers.track_id
+    const client = new LyricsClient("BQD8D0NrL3nIlTpungmePQW4fSCcelHcYWmEfaSVvYiTFxzMlf7sJRQC1PYCTjaIu0XAN3mTgIMGP9hqnuLFaH6o21Bgjnrj-7eSVJq1VPtAbrPFasGOXLQeGSuu8Eu7youD5Ap_eoAyZYpKR0T9QeRQCuS8AHRteNV8srXPXwTj7riCYcLntdF7tpyy9mhTol7m");
+    console.log('client', client);
+    const lyrics = await client.getLyrics(titre_id);
+    console.log('lyricsAdrien', lyrics);
+
 });
 
 
