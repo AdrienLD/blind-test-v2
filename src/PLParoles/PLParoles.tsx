@@ -5,14 +5,52 @@ import './PLParoles.css'
 import Countdown from '../Components/VisuelQuestion/Countdown/Countdown';
 import LyricsClient from "sync-lyrics"
 import { get } from 'http';
+import { exit } from 'process';
 
 function PLParoles() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
     const [affichage, setAffichage] = React.useState(0)
-    const [lyrics, setLyrics] = React.useState<any>([])
-    const [position, setPosition] = React.useState(0)
+    const lyrics = React.useRef<Array<{ startTimeMs: string, words: string }>>([]);
+    const position = React.useRef(0);
+    const lyricContainer = React.useRef<HTMLDivElement>(null);
+    const timestart = React.useRef(0);
+    const [startmusic, setStartmusic] = React.useState(false)
+    const [lyricsJSX, setLyricsJSX] = React.useState<React.ReactElement | null>(null);
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
+
+    React.useEffect(() => {
+        console.log('musiqueActuelle', startmusic);
+        if (startmusic === false) return;
+        
+        let timer: number;
+        const startTime = new Date().getTime() -  timestart.current;
+        const updateLyrics = () => {
+            const currentTimeMs = new Date().getTime()  - startTime;
+            const jsx = afficherLyrics(lyrics.current, position.current, 4);
+            setLyricsJSX(jsx); // Cette ligne peut être déplacée en dehors de cette fonction si nécessaire
+            if (position.current < lyrics.current.length) {
+                const currentLyric = lyrics.current[position.current];
+                const currentLyricStartTimeMs = parseInt(currentLyric.startTimeMs);
+    
+                if (currentTimeMs >= currentLyricStartTimeMs) {
+                    position.current += 1;
+                    
+                }
+            }
+    
+            timer = requestAnimationFrame(updateLyrics);
+        };
+    
+        // Commence à mettre à jour les paroles
+        updateLyrics();
+    
+        return () => {
+            cancelAnimationFrame(timer);
+        };
+    }, [startmusic]);
+    
+
 
     function sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -99,39 +137,59 @@ function PLParoles() {
         const limit = receivedData[musiqueActuelle].duration * 0.5
         const debut = Math.floor(Math.random() * limit)
         const paroles = await getlyricsId()
-        console.log('debut', debut)
         if (paroles.error === false) {
             let i = 0
             while (parseInt(paroles.lines[i].startTimeMs) < debut) {
                 console.log('lyrics i', paroles.lines[i].startTimeMs, i)
                 i++
             }
-            await getpause(`seek?position_ms=${paroles.lines[i-1].startTimeMs}`, 'PUT')
-            await getpause('play', 'PUT')
-            await sleep(10000)
-        } else {
-            await getpause(`seek?position_ms=${debut}`, 'PUT')
+            getpause('next', 'POST')
+            await getpause(`seek?position_ms=${paroles.lines[i - 1].startTimeMs}`, 'PUT')
+            lyrics.current = paroles.lines
+            position.current = i - 1
+            timestart.current = parseInt(paroles.lines[i - 2].startTimeMs)
+            console.log('lyrics', lyrics.current)
         }
-        
+
     }
 
-    const afficherLyrics = async () => {
-        for (let i = position; i < 50; i++) {
-            console.log('lyrics 1', lyrics[i])
-            console.log('lyrics 2', parseInt(lyrics[i + 1].startTimeMs))
-            await sleep(parseInt(lyrics[i + 1].startTimeMs) - parseInt(lyrics[i].startTimeMs))
-        }
-    }
+    const afficherLyrics = (paroles: any, position: number, affichagesuivant: number) => {
+        return (
+            <div className='paroles'>
+                <div className="secondaires">
+                    {paroles[position - 1].words}
+                </div>
+                <div className="primaires">
+                    {paroles[position].words}
+                </div>
+                {affichagesuivant > 0 &&
+                    <div className="secondaires">
+                        {paroles[position + 1].words}
+                    </div>
+                }
+                {affichagesuivant > 1 &&
+                    <div className="secondaires">
+                        {paroles[position + 2].words}
+                    </div>
+                }
+                {affichagesuivant > 2 &&
+                    <div className="secondaires">
+                        {paroles[position + 3].words}
+                    </div>
+                }
+            </div>
 
+        )
+
+    }
 
     const startmusique = async () => {
         await testtoken()
         await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
         await sleep(100)
-        await getpause('next', 'POST')
-        await getpause('pause', 'PUT')
         await getRandomStartTime()
-        // await getRandomStartTime()
+        await setAffichage(1)
+        setStartmusic(true)
     }
 
     const moreTime = async () => {
@@ -158,6 +216,7 @@ function PLParoles() {
         await getpause('pause', 'PUT')
         setMusiqueActuelle(musiqueActuelle + 1)
         setAffichage(0)
+
     }
 
 
@@ -166,21 +225,16 @@ function PLParoles() {
             <h1>N'Oubliez pas les Paroles !</h1>
             <script type="text/javascript" src="https://tracking.musixmatch.com/t1.0/m_img/e_1/sn_0/l_19915235/su_0/rs_0/tr_3vUCADZOeQ2EJZus_nq7GH01wP79qOxU-KWYz3bsrUtZ9_14VvzJM6e48M0i-V0_D17XhCqc4KoDkUTfWRWrFSa3ZRaeS8-UkymCNQntabWoeSZQMic7SuKwzoSLsBh6LeQ5TrPqTkzuDNDqlPb547uzG1-aOSdsrOAfM4z4EO-6phAf-Xs2Z1fA_hwVGTxahZ8VIecsHnQOvQLuq4uE7ku1I8ez_jQUBIiFV1dFepqUOA3D0hFVtd2VXbwurF4-MYtYkReTr5bjcDFwe6NV2HQvBuD0ddXwtpH4IE9mnnnNGHDp85eEVlCegDKHyM1hpH-qWERgcPkM8n1kKM13sJAU2Qw5tbTxoyhYI96pMLYoGG_8qV2MRHj8lI7mMTlLVPn_LD3VMqUlXV6UXtFNUsxEC75iLSGQcJp_/"></script>
             {
-                affichage <= 2 ?
+                affichage < 2 ?
                     <div className='VisuelQuestion'>
-                        <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
+                        <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
                         <div className="infos">
                             <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
-                            {affichage === 0 ? <Countdown onFinish={startmusique} timer={0} /> :
-                                affichage === 1 ?
-                                    <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
-                                        <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
-                                        Votre navigateur ne prend pas en charge la balise vidéo.
-                                    </video> :
-                                    <div>
-                                        <button onClick={moreTime}>+ de temps</button>
-                                        <button onClick={response}>Réponse</button>
-                                    </div>
+                            {affichage === 0 ? <Countdown onFinish={() => { startmusique(); }} timer={0} /> :
+                                <div ref={lyricContainer}>En attente des paroles...
+                                    {lyricsJSX}
+                                </div>
+
                             }
                         </div>
                     </div> :
