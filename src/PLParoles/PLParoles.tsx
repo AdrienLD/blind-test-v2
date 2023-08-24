@@ -4,10 +4,13 @@ import { Musique } from '../PlaylistSelection/PlaylistSelection';
 import './PLParoles.css'
 import Countdown from '../Components/VisuelQuestion/Countdown/Countdown';
 import LyricsClient from "sync-lyrics"
+import { get } from 'http';
 
 function PLParoles() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
     const [affichage, setAffichage] = React.useState(0)
+    const [lyrics, setLyrics] = React.useState<any>([])
+    const [position, setPosition] = React.useState(0)
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
 
@@ -57,40 +60,17 @@ function PLParoles() {
     }
 
     async function getlyricsId() {
-        console.log('receivedData', receivedData[musiqueActuelle].titre, receivedData[musiqueActuelle].artiste)
         try {
             const response = await fetch('http://localhost:4000/api/getlyricsId', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    apikey: 'f3c6b3987f2930fd77d65aace3e556e1',
-                    titre: encodeURIComponent(receivedData[musiqueActuelle].titre),
-                    artiste: encodeURIComponent(receivedData[musiqueActuelle].artiste)
+                    titreid: receivedData[musiqueActuelle].id
                 }
             });
             const data = await response.json();
-            let i = 0
-            while (data.message.body.track_list[i].track.has_lyrics === 0) {
-                i++
-                if (i === data.message.body.track_list.length) {
-                    console.log('pas de lyrics')
-                    break
-                }
-            }
-            console.log('richsyng', data.message.body.track_list[i].track.has_richsync)
-            await console.log('lyricssonbgs', data, data.message.body.track_list[i].track.track_id);
-            const lyrics = await fetch('http://localhost:4000/api/getlyrics', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    apikey: 'f3c6b3987f2930fd77d65aace3e556e1',
-                    track_id: receivedData[musiqueActuelle].id
-                }
-            });
-            const final = await lyrics.json();
-            await console.log('lyrics', final);
+            return data;  // Retourner les données reçues
 
-           
         } catch (error) {
             console.error('Erreur lors de l\'échange du code:', error);
             throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
@@ -115,15 +95,43 @@ function PLParoles() {
         }
     }
 
+    const getRandomStartTime = async () => {
+        const limit = receivedData[musiqueActuelle].duration * 0.5
+        const debut = Math.floor(Math.random() * limit)
+        const paroles = await getlyricsId()
+        console.log('debut', debut)
+        if (paroles.error === false) {
+            let i = 0
+            while (parseInt(paroles.lines[i].startTimeMs) < debut) {
+                console.log('lyrics i', paroles.lines[i].startTimeMs, i)
+                i++
+            }
+            await getpause(`seek?position_ms=${paroles.lines[i-1].startTimeMs}`, 'PUT')
+            await getpause('play', 'PUT')
+            await sleep(10000)
+        } else {
+            await getpause(`seek?position_ms=${debut}`, 'PUT')
+        }
+        
+    }
+
+    const afficherLyrics = async () => {
+        for (let i = position; i < 50; i++) {
+            console.log('lyrics 1', lyrics[i])
+            console.log('lyrics 2', parseInt(lyrics[i + 1].startTimeMs))
+            await sleep(parseInt(lyrics[i + 1].startTimeMs) - parseInt(lyrics[i].startTimeMs))
+        }
+    }
+
+
     const startmusique = async () => {
         await testtoken()
-        await getlyricsId()
-        
         await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
         await sleep(100)
         await getpause('next', 'POST')
-        await sleep(5000)
-        await setAffichage(1)
+        await getpause('pause', 'PUT')
+        await getRandomStartTime()
+        // await getRandomStartTime()
     }
 
     const moreTime = async () => {

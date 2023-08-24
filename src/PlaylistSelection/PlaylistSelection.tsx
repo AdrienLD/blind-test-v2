@@ -10,6 +10,7 @@ export interface Musique {
     id: string;
     playlist: string;
     playlistimg: string;
+    duration: number;
 }
 
 const PlaylistSelection: React.FC = () => {

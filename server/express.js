@@ -155,11 +155,9 @@ app.get('/api/playpause', async (req, res) => {
 
 
 app.get('/api/getlyricsId', async (req, res) => {
-    const apikey = req.headers.apikey
-    const titre = req.headers.titre
-    const artiste = req.headers.artiste
+    const titreId = req.headers.titreid
     try {
-        const response = await fetch(`https://api.musixmatch.com/ws/1.1/track.search?q_track=${titre}&q_artist=${artiste}&apikey=${apikey}`, {
+        const response = await fetch(`https://spotify-lyric-api.herokuapp.com/?trackid=${titreId}`, {
             method: 'GET'
         })
         const data = await response.json();
@@ -169,17 +167,6 @@ app.get('/api/getlyricsId', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
-app.get('/api/getlyrics', async (req, res) => {
-    const apikey = req.headers.apikey
-    const titre_id = req.headers.track_id
-    const client = new LyricsClient("BQD8D0NrL3nIlTpungmePQW4fSCcelHcYWmEfaSVvYiTFxzMlf7sJRQC1PYCTjaIu0XAN3mTgIMGP9hqnuLFaH6o21Bgjnrj-7eSVJq1VPtAbrPFasGOXLQeGSuu8Eu7youD5Ap_eoAyZYpKR0T9QeRQCuS8AHRteNV8srXPXwTj7riCYcLntdF7tpyy9mhTol7m");
-    console.log('client', client);
-    const lyrics = await client.getLyrics(titre_id);
-    console.log('lyricsAdrien', lyrics);
-
-});
-
 
 app.listen(4000, () => {
     console.log('Serveur démarré (port 4000)');
