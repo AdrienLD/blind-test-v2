@@ -7,6 +7,7 @@ import Countdown from '../Components/VisuelQuestion/Countdown/Countdown'
 function PLParoles() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
     const [affichage, setAffichage] = React.useState(0)
+    const [infiniteloop, setInfiniteloop] = React.useState(false)
     const lyrics = React.useRef<Array<{ startTimeMs: string, words: string }>>([]);
     const position = React.useRef(0);
     const lyricContainer = React.useRef<HTMLDivElement>(null);
@@ -15,7 +16,7 @@ function PLParoles() {
     const [lyricsJSX, setLyricsJSX] = React.useState<React.ReactElement | null>(null);
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
-
+    let affichagesuivant = 3
     function transformString(input: string) {
         return input.split('').map(char => {
             if (char === ' ') {
@@ -35,26 +36,22 @@ function PLParoles() {
         let isCancelled = false; // Pour suivre si le composant est démonté
 
         const updateLyrics = async () => {
-            if (!lyrics.current) return; // Assurez-vous que lyrics.current n'est pas undefined
-            let affichagesuivant = 2
+            if (!lyrics.current) return; 
             while (position.current < lyrics.current.length && !isCancelled) {
                 const currLyric = lyrics.current[position.current];
                 const nextLyric = lyrics.current[position.current + 1];
                 if (!currLyric || !nextLyric) break;
                 console.log('lyrics', lyrics.current, position.current, currLyric, nextLyric)
-                if (affichagesuivant < 0) {
-                    await getpause('pause', 'PUT')
-                    setStartmusic(false)
-                    break
-                }
 
+                console.log('Adrien', affichagesuivant)
                 setLyricsJSX(
                     <div className='paroles'>
                         <div className="secondaires">
                             {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
+
                         </div>
                         <div className="primaires">
-                            {lyrics.current[position.current].words}
+                            {affichagesuivant === -1 ? transformString(lyrics.current[position.current]?.words) : lyrics.current[position.current]?.words}
                         </div>
                         <div className="secondaires">
                             {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(lyrics.current[position.current + 1]?.words) : lyrics.current[position.current + 1]?.words : '   '}
@@ -68,9 +65,13 @@ function PLParoles() {
                     </div>
 
                 )
-
+                if (affichagesuivant < 0) {
+                    await getpause('pause', 'PUT')
+                    setStartmusic(false)
+                    break
+                }
                 position.current++;
-                affichagesuivant--;
+                infiniteloop === false ? affichagesuivant-- : affichagesuivant++
 
                 await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs));
             }
@@ -82,7 +83,7 @@ function PLParoles() {
             isCancelled = true; // Mettre à jour le flag lors du nettoyage
         };
 
-    }, [startmusic, lyrics, position, setLyricsJSX]);
+    }, [startmusic, lyrics, position, setLyricsJSX, musiqueActuelle]);
 
 
 
@@ -197,32 +198,41 @@ function PLParoles() {
         await sleep(100)
         await getRandomStartTime()
         await setAffichage(1)
+        affichagesuivant = 3
         setStartmusic(true)
     }
 
-    const moreTime = async () => {
-        await testtoken()
-        await getpause('play', 'PUT')
-        await setAffichage(1)
+    const passer = async () => {
     }
 
-    const endTimer = async () => {
-        await testtoken()
-        await getpause('pause', 'PUT')
-        setAffichage(2)
+    const continuer = async () => {
+        setInfiniteloop(true)
+        setStartmusic(true)
+        await getpause('play', 'PUT')
     }
 
     const response = async () => {
-        await testtoken()
-        await getpause('play', 'PUT')
-        await setAffichage(3)
+        setLyricsJSX(
+            <div className='paroles'>
+                <div className="secondaires">
+                    {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
 
+                </div>
+                <div className="primaires">
+                    {lyrics.current[position.current]?.words}
+                </div>
+                <button onClick={() => continuer()}>Continuer</button>
+            </div>
+
+        )
     }
 
     const nextmusique = async () => {
         await testtoken()
         await getpause('pause', 'PUT')
         setMusiqueActuelle(musiqueActuelle + 1)
+        setStartmusic(false)
+        setInfiniteloop(false)
         setAffichage(0)
 
     }
@@ -237,12 +247,13 @@ function PLParoles() {
                     <div className='VisuelQuestion'>
                         <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
                         <div className="infos">
-                            <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
-                            {affichage === 0 ? <Countdown onFinish={() => { startmusique(); }} timer={0} /> :
+                            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
+                            {affichage === 0 ? <Countdown onFinish={() => startmusique()} timer={0} /> :
                                 <div>
                                     {lyricsJSX}
+                                    <button onClick={() => nextmusique()}>Passer</button>
+                                    <button onClick={() => response()}>Réponse</button>
                                 </div>
-
                             }
                         </div>
                     </div> :
