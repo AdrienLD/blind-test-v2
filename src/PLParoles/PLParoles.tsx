@@ -16,65 +16,74 @@ function PLParoles() {
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
 
+    function transformString(input: string) {
+        return input.split('').map(char => {
+            if (char === ' ') {
+                return ' ';
+            } else if (char.match(/[a-zA-Z]/)) {
+                return '-';
+            } else {
+                return char;
+            }
+        }).join('');
+    }
 
     React.useEffect(() => {
         console.log('musiqueActuelle', startmusic);
         if (!startmusic) return;
-    
+
         let isCancelled = false; // Pour suivre si le composant est démonté
-    
+
         const updateLyrics = async () => {
             if (!lyrics.current) return; // Assurez-vous que lyrics.current n'est pas undefined
-            let affichagesuivant = 4
+            let affichagesuivant = 2
             while (position.current < lyrics.current.length && !isCancelled) {
                 const currLyric = lyrics.current[position.current];
                 const nextLyric = lyrics.current[position.current + 1];
                 if (!currLyric || !nextLyric) break;
-                console.log('lyrics', lyrics.current, position.current, currLyric, nextLyric);
-                
+                console.log('lyrics', lyrics.current, position.current, currLyric, nextLyric)
+                if (affichagesuivant < 0) {
+                    await getpause('pause', 'PUT')
+                    setStartmusic(false)
+                    break
+                }
+
                 setLyricsJSX(
                     <div className='paroles'>
                         <div className="secondaires">
-                            
                             {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
                         </div>
                         <div className="primaires">
                             {lyrics.current[position.current].words}
                         </div>
-                        {affichagesuivant > 0 &&
-                            <div className="secondaires">
-                                {lyrics.current[position.current + 1]?.words}
-                            </div>
-                        }
-                        {affichagesuivant > 1 &&
-                            <div className="secondaires">
-                                {lyrics.current[position.current + 2]?.words}
-                            </div>
-                        }
-                        {affichagesuivant > 2 &&
-                            <div className="secondaires">
-                                {lyrics.current[position.current + 3]?.words}
-                            </div>
-                        }
+                        <div className="secondaires">
+                            {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(lyrics.current[position.current + 1]?.words) : lyrics.current[position.current + 1]?.words : '   '}
+                        </div>
+                        <div className="secondaires">
+                            {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(lyrics.current[position.current + 2]?.words) : lyrics.current[position.current + 2]?.words : '   '}
+                        </div>
+                        <div className="secondaires">
+                            {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(lyrics.current[position.current + 3]?.words) : lyrics.current[position.current + 3]?.words : '   '}
+                        </div>
                     </div>
-        
+
                 )
-    
+
                 position.current++;
                 affichagesuivant--;
-    
+
                 await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs));
             }
         };
-    
+
         updateLyrics();
-    
+
         return () => {
             isCancelled = true; // Mettre à jour le flag lors du nettoyage
         };
-    
+
     }, [startmusic, lyrics, position, setLyricsJSX]);
-    
+
 
 
 
@@ -230,7 +239,7 @@ function PLParoles() {
                         <div className="infos">
                             <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>
                             {affichage === 0 ? <Countdown onFinish={() => { startmusique(); }} timer={0} /> :
-                                <div ref={lyricContainer}>En attente des paroles...
+                                <div>
                                     {lyricsJSX}
                                 </div>
 
