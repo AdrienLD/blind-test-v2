@@ -1,8 +1,7 @@
 import nodeFetch from 'node-fetch';
 import express from 'express';
 import cors from 'cors';
-import { URLSearchParams } from 'url';
-import LyricsClient from "sync-lyrics";
+import { URLSearchParams } from 'url'
 
 const app = express();
 
