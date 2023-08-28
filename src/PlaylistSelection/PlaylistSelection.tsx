@@ -14,7 +14,7 @@ export interface Musique {
 }
 
 const PlaylistSelection: React.FC = () => {
-    const playlistNames = ['Années 50', 'Années 60', 'Années 70', 'Années 80', 'Années 90', 'Années 2000', 'Années 2010', 'Années 2020', 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde', 'Films', 'Gen Séries TV', 'Dessins animés', 'Anime OST', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités']
+    const playlistNames = ['Années 50', 'Années 60', 'Années 70', 'Années 80', 'Années 90', 'Années 2000', 'Années 2010', 'Années 2020', 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde', 'Films', 'Gen Séries TV', 'Dessins animés', 'Anime OST', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités', 'Chanson française', 'Rock Français', 'Steel Panther', 'Rap Français', 'Imagine Dragons']
     
     const [playlistsPossibles, setPlaylistsPossibles] = React.useState<PlaylistCardProps[]>(playlistNames.map((name) => ({
         nom: name,

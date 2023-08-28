@@ -10,18 +10,17 @@ function PLParoles() {
     const [infiniteloop, setInfiniteloop] = React.useState(false)
     const lyrics = React.useRef<Array<{ startTimeMs: string, words: string }>>([]);
     const position = React.useRef(0);
-    const lyricContainer = React.useRef<HTMLDivElement>(null);
     const timestart = React.useRef(0);
     const [startmusic, setStartmusic] = React.useState(false)
     const [lyricsJSX, setLyricsJSX] = React.useState<React.ReactElement | null>(null);
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
-    let affichagesuivant = 3
+    let affichagesuivant = 4
     function transformString(input: string) {
         return input.split('').map(char => {
             if (char === ' ') {
                 return ' ';
-            } else if (char.match(/[a-zA-Z]/)) {
+            } else if (char.match(/[a-zA-Zéïèàùç]/)) {
                 return '-';
             } else {
                 return char;
@@ -36,7 +35,7 @@ function PLParoles() {
         let isCancelled = false; // Pour suivre si le composant est démonté
 
         const updateLyrics = async () => {
-            if (!lyrics.current) return; 
+            if (!lyrics.current) return;
             while (position.current < lyrics.current.length && !isCancelled) {
                 const currLyric = lyrics.current[position.current];
                 const nextLyric = lyrics.current[position.current + 1];
@@ -46,6 +45,14 @@ function PLParoles() {
                 console.log('Adrien', affichagesuivant)
                 setLyricsJSX(
                     <div className='paroles'>
+                        <div className="secondaires">
+                            {affichagesuivant < 0 ? lyrics.current[position.current - 3]?.words : '   '}
+
+                        </div>
+                        <div className="secondaires">
+                            {affichagesuivant < 0 ? lyrics.current[position.current - 2]?.words : '   '}
+
+                        </div>
                         <div className="secondaires">
                             {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
 
@@ -65,6 +72,7 @@ function PLParoles() {
                     </div>
 
                 )
+
                 if (affichagesuivant < 0) {
                     await getpause('pause', 'PUT')
                     setStartmusic(false)
@@ -72,7 +80,7 @@ function PLParoles() {
                 }
                 position.current++;
                 infiniteloop === false ? affichagesuivant-- : affichagesuivant++
-
+                
                 await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs));
             }
         };
@@ -83,6 +91,7 @@ function PLParoles() {
             isCancelled = true; // Mettre à jour le flag lors du nettoyage
         };
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [startmusic, lyrics, position, setLyricsJSX, musiqueActuelle]);
 
 
@@ -200,9 +209,6 @@ function PLParoles() {
         await setAffichage(1)
         affichagesuivant = 3
         setStartmusic(true)
-    }
-
-    const passer = async () => {
     }
 
     const continuer = async () => {
