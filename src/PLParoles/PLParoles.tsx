@@ -16,12 +16,14 @@ function PLParoles() {
     const location = useLocation()
     const receivedData: Musique[] = location.state?.playlist;
     let affichagesuivant = 4
+    
+    
     function transformString(input: string) {
         return input.split('').map(char => {
             if (char === ' ') {
                 return ' ';
             } else if (char.match(/[a-zA-Zéïèàùç]/)) {
-                return '-';
+                return '_';
             } else {
                 return char;
             }
@@ -50,7 +52,7 @@ function PLParoles() {
 
                         </div>
                         <div className="secondaires">
-                            {affichagesuivant < 0 ? lyrics.current[position.current - 2]?.words : '   '}
+                            {affichagesuivant < 1 ? lyrics.current[position.current - 2]?.words : '   '}
 
                         </div>
                         <div className="secondaires">
@@ -80,8 +82,14 @@ function PLParoles() {
                 }
                 position.current++;
                 infiniteloop === false ? affichagesuivant-- : affichagesuivant++
-                
-                await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs));
+
+                if (affichagesuivant === 0) {
+                    await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs) - 600);
+                } else {
+                    await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs));
+
+                }
+
             }
         };
 
@@ -183,9 +191,9 @@ function PLParoles() {
         const limit = receivedData[musiqueActuelle].duration * 0.5
         const debut = Math.floor(Math.random() * limit)
         const paroles = await getlyricsId()
-        if (paroles.error === false) {
+        if (paroles.error === false && paroles.lines[2]) {
             let i = 0
-            while (parseInt(paroles.lines[i].startTimeMs) < debut) {
+            while (parseInt(paroles.lines[i].startTimeMs) < debut && paroles.lines[i + affichagesuivant] === '♪') {
                 console.log('lyrics i', paroles.lines[i].startTimeMs, i)
                 i++
             }
@@ -195,11 +203,9 @@ function PLParoles() {
             position.current = i
             timestart.current = parseInt(paroles.lines[i].startTimeMs)
             console.log('lyrics', lyrics.current)
-        }
+        } else { nextmusique() }
 
     }
-
-
 
     const startmusique = async () => {
         await testtoken()
@@ -221,8 +227,13 @@ function PLParoles() {
         setLyricsJSX(
             <div className='paroles'>
                 <div className="secondaires">
+                    {lyrics.current[position.current - 3] ? lyrics.current[position.current - 3].words : '   '}
+                </div>
+                <div className="secondaires">
+                    {lyrics.current[position.current - 2] ? lyrics.current[position.current - 2].words : '   '}
+                </div>
+                <div className="secondaires">
                     {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
-
                 </div>
                 <div className="primaires">
                     {lyrics.current[position.current]?.words}

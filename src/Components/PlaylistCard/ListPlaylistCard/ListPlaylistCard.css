@@ -1,14 +1,14 @@
-.PlaylistCard {
-    background: rgba( 255, 255, 255, 0.15 );
+.ListPlaylistCard {
+    background: rgba(1, 31, 120, 0.751);
     box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
     backdrop-filter: blur( 10.5px );
     -webkit-backdrop-filter: blur( 10.5px );
     border-radius: 10px;
     border: 1px solid rgba( 255, 255, 255, 0.18 );
-    height: 250px;
+    height: 100px;
     width: 260px;
-    transition-duration: 0.2s;
     margin: 10px;
+    transition-duration: 0.2s;
 }
 
 .PlaylistCard:hover {
@@ -16,29 +16,12 @@
     transition: transform 0.1s ease-in-out;
 }
 
-.titre {
+.Listtitre {
     color: rgb(255, 255, 255);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 20px;
+    font-size: 35px;
     font-weight: bold;
     text-align: center;
-    margin-top: 10px;
-    max-height: 40px;
-    overflow: auto;
+    padding: 10%;
     scrollbar-width: none;
-}
-
-.logoplaylist{
-    width: 70%;
-    margin: 5px auto;
-  display: block;
-}
-
-.done {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: green;
-    font-size: 200px !important;
 }

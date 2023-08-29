@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image: url("background.jpg");
@@ -27,12 +27,11 @@ button {
     -webkit-backdrop-filter: blur( 10.5px );
     border-radius: 10px;
     border: 1px solid rgba( 255, 255, 255, 0.18 );
-    padding: 10px 20px;
     color: rgb(255, 255, 255);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 35px;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    margin: 10px;
+    margin: 10px 10px 10px 0px;
 }

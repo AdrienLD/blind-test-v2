@@ -156,7 +156,7 @@ app.get('/api/playpause', async (req, res) => {
 app.get('/api/getlyricsId', async (req, res) => {
     const titreId = req.headers.titreid
     try {
-        const response = await fetch(`https://spotify-lyric-api.herokuapp.com/?trackid=${titreId}`, {
+        const response = await fetch(`https://spotify-lyric-api-984e7b4face0.herokuapp.com/?trackid=${titreId}`, {
             method: 'GET'
         })
         const data = await response.json();

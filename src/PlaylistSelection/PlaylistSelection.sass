@@ -1,0 +1,63 @@
+.PlaylistSelection
+    display: flex
+    flex-direction: column
+    .TitreChoix 
+        color: white
+        font-size: 40px
+        font-weight: bold
+        text-align: center
+        margin: 20px 0px
+    .listPlaylists 
+        display: flex
+        flex-direction: row
+        margin: 20px
+        .PlaylistsPossibles
+            display: flex
+            flex-direction: row
+            flex-wrap: wrap
+            align-content: flex-start
+            margin-left: 30px
+    .Selection
+        display: flex
+        justify-content: space-between
+        flex-direction: row
+        align-self: center
+        align-items: center
+        position: fixed
+        bottom: 25px
+        left: 30px
+        right: 30px
+        height: 75px
+        .ListPlaylistCard
+            height: 100%
+            flex-shrink: 0
+            margin: 0px
+            margin-right: 30px
+        .cartesSelectionnees
+            display: flex
+            flex-direction: row
+            flex-grow: 1
+            overflow: auto
+            height: 100%
+            .cartes
+                display: flex
+                background: rgba(1, 31, 120, 0.751)
+                backdrop-filter: blur( 10.5px )
+                -webkit-backdrop-filter: blur( 10.5px )
+                border-radius: 10px
+                border: 1px solid rgba( 255, 255, 255, 0.18 )
+                width: 100px
+                margin-left: 10px
+                font-size: 20px
+                font-weight: bold
+                color: white
+                text-align: center
+                justify-content: center
+                align-items: center
+        .Validations
+            height: 100%
+            flex-shrink: 0
+            button
+                padding: 0px 20px
+                height: 100%
+                margin: 0 10px
