@@ -6,6 +6,7 @@
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.6",
+    "@mui/material": "^5.15.6",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -32,7 +33,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start-server": "node server/express.js",
-    "start-both": "concurrently \"npm start\" \"npm run start-server\""
+    "start-both": "concurrently \"npm start\" \"npm run start-server\"",
+    "update-images": "node src/Components/updateImages.js"
   },
   "eslintConfig": {
     "extends": [
