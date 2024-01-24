@@ -1,14 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Musique } from '../PlaylistSelection/PlaylistSelection';
+import { getSpotifyToken } from './Playlist';
 
 
 function CallBack() {
     const navigate = useNavigate();
 
+    console.log('CallBack')
+
+    const isTokenFetched = React.useRef(false);
+
     React.useEffect(() => {
-        extractmusique();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (!isTokenFetched.current) {
+            extractmusique();
+            isTokenFetched.current = true;
+        }
     }, []);
 
     function shuffle(array: Musique[]) {
@@ -60,8 +67,7 @@ function CallBack() {
                 },
                 body: JSON.stringify({
                     titre: titre,
-                    type: 'playlist',
-                    token: localStorage.getItem('token')
+                    type: 'playlist'
                 })
             });
 
@@ -83,8 +89,7 @@ function CallBack() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    playlistId: id,
-                    token: localStorage.getItem('token')
+                    playlistId: id
                 })
             });
 
@@ -98,33 +103,11 @@ function CallBack() {
         }
     }
 
-    async function gettoken() {
-        localStorage.setItem('access_code', window.location.search.split('=')[1]);
-        try {
-            
-            const response = await fetch('http://localhost:4000/api/gettoken', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    code: window.location.search.split('=')[1]
-                })
-            });
-            const data = await response.json();
-            await console.log('responseAdrien', data);
-            await localStorage.setItem('token', data.access_token);
-            
-        } catch (error) {
-            console.error('Erreur lors de l\'échange du code:', error);
-            throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
-        }
-    }
-
     const extractmusique = async () => {
-        await console.log('extractmusique');
-        await gettoken()
-        const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]');
+        await console.log('extractmusique')
+        await getSpotifyToken()
+        const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]')
+        console.log('playlistSelection', playlistSelection)
         let playlistComplete: Musique[][] = [];
         for (let index = 0; index < playlistSelection.length; index++) {
             const playlist = playlistSelection[index];
