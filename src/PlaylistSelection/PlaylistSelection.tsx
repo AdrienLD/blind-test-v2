@@ -4,6 +4,8 @@ import './PlaylistSelection.sass';
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
+import ClearIcon from '@mui/icons-material/Clear';
+import { playlist } from '../Components/Playlist';
 
 export interface Musique {
     titre: string;
@@ -17,15 +19,8 @@ export interface Musique {
 }
 
 const PlaylistSelection: React.FC = () => {
-    const playlistSelections: [string, string[]][] = [
-    [ 'Années' , ['50', '60', '70', '80', '90', '2000', '2010', '2020'] ],
-    [ 'Genres' , ['Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde'] ],
-    [ 'Artistes' , ['Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga'] ],
-    [ 'Télévision' , ['Films', 'Gen Séries TV', 'Dessins animés', 'Anime OST', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités'] ],
-    [ 'Langues' , ['Chanson française', 'Rock Français', 'Rap Français'] ],
-    [ 'Ajouter' , ['Ajouter une playlist'] ]
-    ]
-
+    
+    const playlistSelections = playlist
     const fileInputRef = React.useRef<HTMLInputElement>(null)
 
     const ListPlaylists: ListPlaylistCardProps[] = playlistSelections.map((selection): ListPlaylistCardProps => ({
@@ -99,6 +94,10 @@ const PlaylistSelection: React.FC = () => {
         }
     }
 
+    const clearList = () => {
+        setPlaylistsSelectionnees([])
+    }
+
     return (
         <div className='PlaylistSelection'>
             <div className="TitreChoix">
@@ -137,6 +136,7 @@ const PlaylistSelection: React.FC = () => {
                     }
                 </div>
                 <div className="Validations">
+                    <button onClick={() => clearList()}><ClearIcon/></button>
                     <button onClick={() => exportmusique()}><FileUploadIcon/></button>
                     <button onClick={onImportClick}><FileDownloadIcon/></button>
                     <input 
