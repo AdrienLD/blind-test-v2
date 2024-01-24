@@ -5,20 +5,28 @@ import transparent from '../Images/trans.png'
 import DoneIcon from '@mui/icons-material/Done';
 
 export interface PlaylistCardProps {
+  genre: string;
   nom: string;
   choisie: boolean;
   onClick: () => void;
 }
 
 function PlaylistCard(props: PlaylistCardProps) {
-  console.log(props.choisie)
+  console.log(props.nom, props.genre)
+  const imagePath = `/images/${props.genre} - ${props.nom}.jpg`
+  
+  const handleImageError = (e:any) => {
+      e.target.onerror = null; // Pour éviter une boucle infinie en cas d'erreur sur l'image de remplacement
+      e.target.src = transparent
+  }
+
   return (
     <div className="PlaylistCard" onClick={props.onClick} style={props.choisie ? {transform: 'scale(0.7)'} : {}}>
       <div className="titre">
         {props.nom}
       </div>
       <div style={{ position: 'relative', display: 'inline-block' }}>
-        <img src={transparent} className='logoplaylist' alt='logoimage'/>
+        <img src={imagePath} className='logoplaylist' alt='logoimage' onError={handleImageError}/>
         {
           props.choisie && <DoneIcon className='done' />
         }

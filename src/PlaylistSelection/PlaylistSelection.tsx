@@ -116,6 +116,7 @@ const PlaylistSelection: React.FC = () => {
                     {
                         PlaylistsAfficher[1].map((playlist) => (
                             <PlaylistCard 
+                            genre={PlaylistsAfficher[0]}
                             nom={playlist} 
                             choisie={PlaylistsSelectionnees.includes(`${PlaylistsAfficher[0]} £ ${playlist}`)}
                             onClick={() => { addNewPlaylist(PlaylistsAfficher[0], playlist) }} />
