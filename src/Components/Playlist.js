@@ -21,9 +21,13 @@ export async function getSpotifyToken() {
             },
             body: JSON.stringify({
                 code: window.location.search.split('=')[1]
-            })
+            }),
+            credentials: 'include'
         });
-        console.log('response token')
+        console.log(response)
+        const data = await response.json()
+        console.log(data)
+
     } catch (error) {
         console.error('Erreur lors de l\'échange du code:', error);
         throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques

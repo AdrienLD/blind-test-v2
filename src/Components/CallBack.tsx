@@ -67,8 +67,10 @@ function CallBack() {
                 },
                 body: JSON.stringify({
                     titre: titre,
-                    type: 'playlist'
-                })
+                    type: 'playlist',
+                    
+                }),
+                credentials: 'include'
             });
 
             console.log('response', response);

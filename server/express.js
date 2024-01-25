@@ -7,8 +7,8 @@ import { URLSearchParams } from 'url'
 const app = express();
 
 const corsOptions = {
-    origin: 'http://localhost:3000', // Remplacez par l'origine appropriée
-    credentials: true // Important pour inclure les cookies
+    origin: 'http://localhost:3000',
+    credentials: true
 };
 
 app.use(cors(corsOptions))
@@ -19,7 +19,6 @@ const CLIENT_ID = 'bbbe51c137b24687a4edb6c27fbb5dac'
 const CLIENT_SECRET = '58db67382ecf4533a02aabbcd71ae60d'
 
 app.post('/api/gettoken', async (req, res) => {
-    console.log('debutrequete', req.body)
     const code = req.body.code
     const params = new URLSearchParams();
     params.append('grant_type', 'authorization_code');
@@ -35,13 +34,14 @@ app.post('/api/gettoken', async (req, res) => {
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
             body: params,
-            headers: headers
-        });
+            headers: headers,
+            credentials: 'include'
+        })
+        const data = await response.json()        
+        res.cookie('token', data.access_token, { httpOnly: true })
+        res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
+        res.send(data)
 
-        const data = await response.json()
-        res.cookie('token', data.access_token)
-        res.cookie('refresh_token', data.refresh_token)
-        res.send('Cookie HttpOnly défini')
     
     } catch (error) {
         console.error('Error fetching access token:', error.message);
@@ -74,7 +74,7 @@ app.post('/api/research', async (req, res) => {
     const { titre, type } = req.body
     
     const token = req.cookies.token
-    console.log(token, res, 'research')
+    console.log(token, 'research')
 
     try {
         const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
