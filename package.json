@@ -7,6 +7,11 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.6",
     "@mui/material": "^5.15.6",
+    "@nextui-org/react": "^2.2.9",
+    "@nextui-org/switch": "^2.0.25",
+    "@nextui-org/system": "^2.0.15",
+    "@nextui-org/theme": "^2.1.17",
+    "@radix-ui/react-switch": "^1.0.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,14 +21,15 @@
     "@types/react-dom": "^18.2.7",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "framer-motion": "^11.0.3",
     "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
     "sass": "^1.70.0",
+    "shadcn-ui": "^0.8.0",
     "sync-lyrics": "^1.0.5",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -56,7 +62,10 @@
     ]
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "concurrently": "^8.2.0",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.1",
     "eslint": "^8.56.0"
   },
   "type": "module"

@@ -1,65 +1,123 @@
+.logo
+    position: fixed
+    top: 10px
+    left: 50%
+    transform: translateX(-50%)
+    width: 300px
+    height: auto
+
 .PlaylistSelection
     display: flex
     flex-direction: column
-    margin-bottom: 100px
+    margin-top: 190px
+
     .TitreChoix 
         color: white
         font-size: 40px
         font-weight: bold
         text-align: center
         margin: 20px 0px
+        position: fixed
+        top: 130px
+        left: 50%
+        transform: translateX(-50%)
+        width: 100%
+
     .listPlaylists 
         display: flex
         flex-direction: row
-        margin: 20px
+        margin-top: 20px
+
+        .catalogue
+            width: 250px
+            position: fixed
+            left: 20px
+
         .PlaylistsPossibles
-            display: flex
-            flex-direction: row
-            flex-wrap: wrap
-            align-content: flex-start
-            margin-left: 30px
-    .Selection
-        display: flex
-        justify-content: space-between
-        flex-direction: row
-        align-self: center
-        align-items: center
-        position: fixed
-        bottom: 25px
-        left: 30px
-        right: 30px
-        height: 75px
-        .ListPlaylistCard
-            height: 100%
-            flex-shrink: 0
-            margin: 0px
-            margin-right: 30px
-            background: rgba(0, 23, 91, 0.8)
-        .cartesSelectionnees
-            display: flex
-            flex-direction: row
             flex-grow: 1
-            overflow: auto
-            height: 100%
-            .cartes
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(20%, 1fr))
+            gap: 10px
+            margin-left: 290px
+            margin-right: 340px
+
+        .panneaudroite
+            width: 300px
+            position: fixed
+            right: 20px
+            bottom: 15px
+
+            .Selection
+                width: 300px
+                top: 210px
+                bottom: 90px
+                height: auto
+                position: fixed
                 display: flex
+                flex-direction: column
                 background: rgba(1, 31, 120, 0.751)
+                box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 )
                 backdrop-filter: blur( 10.5px )
                 -webkit-backdrop-filter: blur( 10.5px )
                 border-radius: 10px
-                border: 1px solid rgba( 255, 255, 255, 0.18 )
-                width: 100px
-                margin-left: 10px
-                font-size: 20px
-                font-weight: bold
-                color: white
-                text-align: center
-                justify-content: center
-                align-items: center
-        .Validations
-            height: 100%
-            flex-shrink: 0
-            button
-                padding: 0px 20px
-                height: 100%
-                margin: 0 10px
+                border: 1px solid rgba( 255, 255, 255, 0.18)
+                right: 20px
+
+                .Carte_Selection
+                    display: flex
+                    justify-content: space-around
+                    width: 100%
+                    color: white
+                    font-size: 40px
+                    align-items: center
+                    font-weight: bold
+                    margin-top: 10px
+                    .DeleteIconsButon
+                        &:hover
+                            color: red
+                            
+                .cartesSelectionnees
+                    display: flex
+                    flex-direction: column
+                    margin: 20px
+                    overflow-x: scroll
+                    scrollbar-width: none
+                    .cartes
+                        display: grid
+                        grid-template-columns: 40px 1fr 25px
+                        gap: 10px
+                        background: rgba(1, 31, 120, 0.751)
+                        margin-bottom: 10px
+                        background: rgba( 255, 255, 255, 0.15 )
+                        box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 )
+                        backdrop-filter: blur( 10.5px )
+                        -webkit-backdrop-filter: blur( 10.5px )
+                        border-radius: 10px
+                        border: 1px solid rgba( 255, 255, 255, 0.18 )
+                        color: rgb(255, 255, 255)
+                        padding: 5px
+                        align-items: center
+                        img
+                            width: 100%
+                            border-radius: 10%
+                        .DeletePlaylist
+
+                            .DeletePlaylistIcon
+                                font-size: 20px
+                                &:hover
+                                    color: red
+                .Validations
+                    margin-top: auto
+                    margin-bottom: 20px
+                    display: flex
+                    flex-direction: column
+                    button
+                        padding: 10px
+                        font-size: 20px
+                        margin: 5px 10px
+            .Start
+                width: 100%
+                font-size: 50px
+                &:hover
+                    background: rgba(4, 75, 0, 0.751)
+

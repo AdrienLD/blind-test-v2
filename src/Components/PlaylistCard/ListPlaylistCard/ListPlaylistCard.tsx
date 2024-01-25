@@ -9,7 +9,7 @@ export interface ListPlaylistCardProps {
 function ListPlaylistCard(props: ListPlaylistCardProps) {
 
   return (
-    <div className="ListPlaylistCard" onMouseEnter={props.onHover} >
+    <div className="ListPlaylistCard" onClick={props.onHover} >
       {props.nom}
     </div>
   )

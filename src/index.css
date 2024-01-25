@@ -29,9 +29,7 @@ button {
     border: 1px solid rgba( 255, 255, 255, 0.18 );
     color: rgb(255, 255, 255);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 35px;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    margin: 10px 10px 10px 0px;
 }
