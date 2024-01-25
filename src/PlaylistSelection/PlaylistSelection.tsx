@@ -5,7 +5,7 @@ import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistC
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import ClearIcon from '@mui/icons-material/Clear';
-import { playlist } from '../Components/Playlist';
+import { getSpotifyToken, playlist } from '../Components/Playlist';
 
 export interface Musique {
     titre: string;
@@ -56,17 +56,21 @@ const PlaylistSelection: React.FC = () => {
     }
 
     const extractmusique = async (mode: string) => {
+        
+        
         localStorage.setItem('mode', mode)
+        const PlaylistSelection = PlaylistsSelectionnees.map((playlist) => playlist)
+        await localStorage.setItem('playlists', JSON.stringify(PlaylistSelection))
         const SCOPES = [
             "ugc-image-upload",
             "user-read-playback-state",
             "user-modify-playback-state",
             "user-read-currently-playing",
             "streaming",
-        ];
+        ]
         const REDIRECT_URI = 'http://localhost:3000/callback';
 
-        window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${SCOPES.join("%20")}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${SCOPES.join("%20")}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
     }
 
     const importmusique = (file: Blob): void => {

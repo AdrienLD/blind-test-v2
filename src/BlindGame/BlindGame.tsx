@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Musique } from '../PlaylistSelection/PlaylistSelection';
 import './BlindGame.css'
 import Countdown from '../Components/VisuelQuestion/Countdown/Countdown';
+import { getSpotifyToken } from '../Components/Playlist';
 
 function BlindGame() {
     const [musiqueActuelle, setMusiqueActuelle] = React.useState(0);
@@ -33,29 +34,6 @@ function BlindGame() {
         }
     }
 
-    async function gettoken() {
-        const code = localStorage.getItem('access_code');
-        try {
-
-            const response = await fetch('http://localhost:4000/api/gettoken', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    code: code
-                })
-            });
-            const data = await response.json();
-            await console.log('responseAdrien', data);
-            await localStorage.setItem('token', data.access_token);
-
-        } catch (error) {
-            console.error('Erreur lors de l\'échange du code:', error);
-            throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
-        }
-    }
-
     async function testtoken() {
         const token = localStorage.getItem('token')!
         try {
@@ -66,7 +44,7 @@ function BlindGame() {
                 }
             });
             const data = await response.json();
-            if (data.error?.status === 401) await gettoken();
+            // if (data.error?.status === 401) await getSpotifyToken()
             await console.log('responseAdrien', data);
         } catch (error) {
             console.error('Erreur lors de l\'échange du code:', error)

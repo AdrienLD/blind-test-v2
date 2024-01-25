@@ -1,13 +1,19 @@
 import nodeFetch from 'node-fetch';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser'
 import { URLSearchParams } from 'url'
 
 const app = express();
 
-app.use(cors()); // Utilisez CORS pour permettre à votre front-end de faire des requêtes vers ce serveur
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true
+};
 
-app.use(express.json());
+app.use(cors(corsOptions))
+app.use(express.json())
+app.use(cookieParser())
 
 const CLIENT_ID = 'bbbe51c137b24687a4edb6c27fbb5dac'
 const CLIENT_SECRET = '58db67382ecf4533a02aabbcd71ae60d'
@@ -28,12 +34,15 @@ app.post('/api/gettoken', async (req, res) => {
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
             body: params,
-            headers: headers
-        });
+            headers: headers,
+            credentials: 'include'
+        })
+        const data = await response.json()        
+        res.cookie('token', data.access_token, { httpOnly: true })
+        res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
+        res.send(data)
 
-        const data = await response.json();
-        if (data.access_token) res.json({ access_token: data.access_token })
-
+    
     } catch (error) {
         console.error('Error fetching access token:', error.message);
         res.status(500).send('Internal Server Error');
@@ -41,7 +50,8 @@ app.post('/api/gettoken', async (req, res) => {
 })
 
 app.get('/api/testtoken', async (req, res) => {
-    const token = req.headers.token
+    const token = req.cookies.token
+    console.log(token, 'testtoken')
     try {
         const response = await fetch('https://api.spotify.com/v1/me/player', {
             method: 'GET',
@@ -61,7 +71,10 @@ app.get('/api/testtoken', async (req, res) => {
 });
 
 app.post('/api/research', async (req, res) => {
-    const { titre, type, token } = req.body
+    const { titre, type } = req.body
+    
+    const token = req.cookies.token
+    console.log(token, 'research')
 
     try {
         const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {

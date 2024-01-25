@@ -52,28 +52,6 @@ const requireplalist = async (titre, genre) => {
         });
     }
 
-    async function gettoken() {
-        const code = localStorage.getItem('access_code');
-        try {
-
-            const response = await fetch('http://localhost:4000/api/gettoken', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    code: code
-                })
-            })
-            const data = await response.json()
-            await console.log('responseAdrien', data)
-
-        } catch (error) {
-            console.error('Erreur lors de l\'échange du code:', error);
-            throw error; // Propager l'erreur pour pouvoir la gérer dans listemusiques
-        }
-    }
-
 function main(){
     // gettoken()
     for (const genre in playlist) {
