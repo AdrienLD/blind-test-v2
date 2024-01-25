@@ -3,12 +3,17 @@ import { useLocation } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './BlindGame.sass'
 import Countdown from '../VisuelQuestion/Countdown/Countdown'
+import { getSpotifyAction } from '../Playlist'
 
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
   const [ affichage, setAffichage ] = React.useState(0)
   const [ entrainement, setEntrainement ] = React.useState(false)
-  setEntrainement(localStorage.getItem('mode') === 'entrainement')
+  
+  React.useEffect(() => {
+    const modeEntrainement = localStorage.getItem('mode') === 'entrainement'
+    setEntrainement(modeEntrainement)
+  }, [])
   
   const location = useLocation()
   const receivedData: Musique[] = location.state?.playlist
@@ -17,84 +22,22 @@ function BlindGame() {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  async function getpause(commande: string, method: string) {
-    const token = localStorage.getItem('token')!
-    try {
-      await fetch('http://localhost:4000/api/playpause', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          token: token,
-          command: commande,
-          method: method
-        }
-      })
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error
-    }
-  }
-
-  async function gettoken() {
-    const code = localStorage.getItem('access_code')
-    try {
-
-      const response = await fetch('http://localhost:4000/api/gettoken', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          code: code
-        })
-      })
-      const data = await response.json()
-      await console.log('responseAdrien', data)
-      await localStorage.setItem('token', data.access_token)
-
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error // Propager l'erreur pour pouvoir la gérer dans listemusiques
-    }
-  }
-
-  async function testtoken() {
-    const token = localStorage.getItem('token')!
-    try {
-      const response = await fetch('http://localhost:4000/api/testtoken', {
-        method: 'GET',
-        headers: {
-          token: token
-        }
-      })
-      const data = await response.json()
-      if (data.error?.status === 401) await gettoken()
-      await console.log('responseAdrien', data)
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error
-    }
-  }
-
 
   const moreTime = async () => {
-    await testtoken()
-    await getpause('play', 'PUT')
+    await getSpotifyAction('play', 'PUT')
     await setAffichage(1)
   }
 
   
   const nextmusique = async () => {
-    await testtoken()
-    await getpause('pause', 'PUT')
+    await getSpotifyAction('pause', 'PUT')
     setMusiqueActuelle(musiqueActuelle + 1)
     setAffichage(0)
   }
 
   const response = async () => {
     if (!entrainement) {
-      await testtoken()
-      await getpause('play', 'PUT')
+      await getSpotifyAction('play', 'PUT')
 
     } else {
       const utterance = new SpeechSynthesisUtterance(`${receivedData[musiqueActuelle].titre} de ${receivedData[musiqueActuelle].artiste}`)
@@ -111,8 +54,7 @@ function BlindGame() {
   }
 
   const endTimer = async () => {
-    await testtoken()
-    await getpause('pause', 'PUT')
+    await getSpotifyAction('pause', 'PUT')
     if (!entrainement) {
       setAffichage(2)
     } else {
@@ -121,10 +63,9 @@ function BlindGame() {
     }
   }
   const startmusique = async () => {
-    await testtoken()
-    await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
+    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
     await sleep(100)
-    await getpause('next', 'POST')
+    await getSpotifyAction('next', 'POST')
     await sleep(5000)
     if (!entrainement) {
       await setAffichage(1)
@@ -133,9 +74,6 @@ function BlindGame() {
       await endTimer()
     }
   }
-
-  
-
 
   return (
     <div>

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './PLParoles.css'
 import Countdown from '../VisuelQuestion/Countdown/Countdown'
+import { getSpotifyAction } from '../Playlist'
 
 function PLParoles() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
@@ -76,7 +77,7 @@ function PLParoles() {
         )
 
         if (affichagesuivant < 0) {
-          await getpause('pause', 'PUT')
+          await getSpotifyAction('pause', 'PUT')
           setStartmusic(false)
           break
         }
@@ -101,29 +102,8 @@ function PLParoles() {
   }, [ startmusic, lyrics, position, setLyricsJSX, musiqueActuelle ])
 
 
-
-
-
   function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
-  async function getpause(commande: string, method: string) {
-    const token = localStorage.getItem('token')!
-    try {
-      await fetch('http://localhost:4000/api/playpause', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          token: token,
-          command: commande,
-          method: method
-        }
-      })
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error
-    }
   }
 
   async function getlyricsId() {
@@ -144,27 +124,8 @@ function PLParoles() {
     }
   }
 
-  async function testtoken() {
-    const token = localStorage.getItem('token')!
-    try {
-      const response = await fetch('http://localhost:4000/api/testtoken', {
-        method: 'GET',
-        headers: {
-          token: token
-        }
-      })
-      const data = await response.json()
-      //if (data.error?.status === 401) await getSpotifyToken();
-      await console.log('responseAdrien', data)
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error
-    }
-  }
-
   const nextmusique = async () => {
-    await testtoken()
-    await getpause('pause', 'PUT')
+    await getSpotifyAction('pause', 'PUT')
     setMusiqueActuelle(musiqueActuelle + 1)
     setStartmusic(false)
     setInfiniteloop(false)
@@ -181,8 +142,8 @@ function PLParoles() {
         console.log('lyrics i', paroles.lines[i].startTimeMs, i)
         i++
       }
-      getpause('next', 'POST')
-      await getpause(`seek?position_ms=${paroles.lines[i].startTimeMs}`, 'PUT')
+      getSpotifyAction('next', 'POST')
+      await getSpotifyAction(`seek?position_ms=${paroles.lines[i].startTimeMs}`, 'PUT')
       lyrics.current = paroles.lines
       position.current = i
       timestart.current = parseInt(paroles.lines[i].startTimeMs)
@@ -192,8 +153,7 @@ function PLParoles() {
   }
 
   const startmusique = async () => {
-    await testtoken()
-    await getpause(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
+    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
     await sleep(100)
     await getRandomStartTime()
     await setAffichage(1)
@@ -204,7 +164,7 @@ function PLParoles() {
   const continuer = async () => {
     setInfiniteloop(true)
     setStartmusic(true)
-    await getpause('play', 'PUT')
+    await getSpotifyAction('play', 'PUT')
   }
 
   const response = async () => {
