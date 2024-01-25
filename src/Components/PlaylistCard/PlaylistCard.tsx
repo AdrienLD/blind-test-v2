@@ -1,14 +1,13 @@
-import React from 'react';
-import './PlaylistCard.css';
-import Carre from '../Images/carre.jpg';
+import React from 'react'
+import './PlaylistCard.css'
 import transparent from '../Images/trans.png'
-import DoneIcon from '@mui/icons-material/Done';
+import DoneIcon from '@mui/icons-material/Done'
 
 export interface PlaylistCardProps {
-  genre: string;
-  nom: string;
-  choisie: boolean;
-  onClick: () => void;
+  genre: string
+  nom: string
+  choisie: boolean
+  onClick: () => void
 }
 
 function PlaylistCard(props: PlaylistCardProps) {
@@ -16,12 +15,12 @@ function PlaylistCard(props: PlaylistCardProps) {
   const imagePath = `/images/${props.genre} - ${props.nom}.jpg`
   
   const handleImageError = (e:any) => {
-      e.target.onerror = null; // Pour éviter une boucle infinie en cas d'erreur sur l'image de remplacement
-      e.target.src = transparent
+    e.target.onerror = null // Pour éviter une boucle infinie en cas d'erreur sur l'image de remplacement
+    e.target.src = transparent
   }
 
   return (
-    <div className="PlaylistCard" onClick={props.onClick} style={props.choisie ? {transform: 'scale(0.7)'} : {}}>
+    <div className="PlaylistCard" onClick={props.onClick} style={props.choisie ? { transform: 'scale(0.7)' } : {}}>
       <div className="titre">
         {props.nom}
       </div>
@@ -36,4 +35,4 @@ function PlaylistCard(props: PlaylistCardProps) {
   )
 }
 
-export default PlaylistCard;
+export default PlaylistCard
