@@ -31,10 +31,6 @@ const PlaylistSelection: React.FC = () => {
   }))
 
   const [ PlaylistsSelectionnees, setPlaylistsSelectionnees ] = React.useState<string[]>([])
-    
-
-
-  const CLIENT_ID = 'bbbe51c137b24687a4edb6c27fbb5dac'
 
 
   const addNewPlaylist = (listplaylist: string, playlist: string) => {
@@ -79,18 +75,8 @@ const PlaylistSelection: React.FC = () => {
         
         
     localStorage.setItem('mode', mode)
-    const PlaylistSelection = PlaylistsSelectionnees.map((playlist) => playlist)
-    await localStorage.setItem('playlists', JSON.stringify(PlaylistSelection))
-    const SCOPES = [
-      'ugc-image-upload',
-      'user-read-playback-state',
-      'user-modify-playback-state',
-      'user-read-currently-playing',
-      'streaming'
-    ]
-    const REDIRECT_URI = 'http://localhost:3000/callback'
-
-    window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${SCOPES.join('%20')}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
+    await localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
+    window.location.href = 'http://localhost:4000/api/start-auth' // Remplacez par l'URL de votre serveur
   }
   
   const onImportClick = () => {
