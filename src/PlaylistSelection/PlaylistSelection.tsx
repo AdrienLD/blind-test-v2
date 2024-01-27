@@ -6,6 +6,12 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { playlist, secretKey } from '../Components/Playlist'
 import CryptoJS from 'crypto-js'
 
+import Alert from '@mui/material/Alert'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+
+
 
 export interface Musique {
   titre: string
@@ -19,7 +25,10 @@ export interface Musique {
 }
 
 const PlaylistSelection: React.FC = () => {
-    
+  const [ open, setOpen ] = React.useState(false)
+  const [ showAlert, setShowAlert ] = React.useState(false)
+
+  
   const playlistSelections = playlist
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   
@@ -37,6 +46,7 @@ const PlaylistSelection: React.FC = () => {
     const playlists = `${listplaylist} £ ${playlist}`
     if (!PlaylistsSelectionnees.includes(playlists)) {
       setPlaylistsSelectionnees(PlaylistsSelectionnees.concat(playlists))
+      setShowAlert(false)
     } else {
       setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlists))
     }
@@ -61,7 +71,7 @@ const PlaylistSelection: React.FC = () => {
       }
     }
     reader.readAsText(file)
-    console.log(file)
+
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +82,7 @@ const PlaylistSelection: React.FC = () => {
   }
 
   const extractmusique = async (mode: string) => {
-        
+    setOpen(false)
         
     localStorage.setItem('mode', mode)
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(PlaylistsSelectionnees), secretKey).toString()
@@ -95,13 +105,22 @@ const PlaylistSelection: React.FC = () => {
     setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlistToDelete))
   }
 
+  const openDialog = () => {
+    if (PlaylistsSelectionnees.length !== 0) {
+      setOpen(true)
+      setShowAlert(false)
+    } else {
+      setShowAlert(true)
+    }
+  }
 
 
   return (
     <div className='PlaylistSelection'>
-      <div className="TitreChoix">
+
+      <h2>
                 Choisissez les playlists que vous voulez avoir dans votre BlindTest
-      </div>
+      </h2>
       <div className="listPlaylists">
                 
         <div className='catalogue'>
@@ -140,7 +159,8 @@ const PlaylistSelection: React.FC = () => {
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.src = '/images/trans.png'
-                      }}/>                    {playlist.replace(` £ `,' - ')}
+                      }}/>                    
+                    {playlist.replace(` £ `,' - ')}
                     <div onClick={() => deleteThisPlaylist(playlist)} className='DeletePlaylist'>
                       <DeleteIcon className='DeletePlaylistIcon'/>
                     </div>
@@ -158,14 +178,50 @@ const PlaylistSelection: React.FC = () => {
                 style={{ display: 'none' }} 
               />
             </div>
-            <button onClick={() => extractmusique('blind')}>Blind Test</button>
-            <button onClick={() => extractmusique('nplp')}>N'Oubliez PLP</button>
           </div>
-          <button className="Start">Start</button>
+          <button className="Start" onClick={() => openDialog()}>Start</button>
         </div>
       </div>
+      <Dialog open={open} onClose={() => setOpen(false)} className='Dialog'>
+        <DialogContent className='DialogContent'>
+          <div className="DialogTitle">
+          Sélectionnez votre mode de jeu
 
+          </div>
 
+          <div className="SplitDialogue">
+            <div className="DialogueChoixGauche">
+              <button onClick={() => extractmusique('blind')}>BlindTest</button>
+              <DialogContentText>
+                Chaque tour, une nouvelle musique parmi la playlist séléctionnée se lance sur votre compte Spotify<br/>
+                Au bout de 10 secondes la musique se mets sur pause, et les regles ne sont pas encore finies<br/>
+              </DialogContentText>
+            </div>
+
+            <div className="DialogueChoixGauche">
+
+              <button onClick={() => extractmusique('nplp')}>N'oubliez PLP</button>
+              <DialogContentText>
+                <ol>
+                  <li>
+                    <strong>Sélection de la Musique :</strong> À chaque tour, une nouvelle chanson est choisie. Si la chanson sélectionnée ne contient pas de paroles sur Spotify, elle est automatiquement passée et une autre est choisie.
+                  </li>
+                  <li>
+                    <strong>Début de la Chanson :</strong> La lecture de la chanson ne commence pas nécessairement au début. Au lieu de cela, elle démarre aléatoirement au début d'une ligne de parole.
+                  </li>
+                  <li>
+                    <strong>Affichage des Paroles :</strong> Trois lignes de paroles seront affichées à l'écran pour vous aider.
+                  </li>
+                  <li>
+                    <strong>Pause et Devinettes :</strong> Après l'affichage des trois lignes, la musique sera mise en pause. C'est à ce moment que vous devez deviner et fournir la suite des paroles de la chanson.
+                  </li>
+                </ol>
+              </DialogContentText>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {showAlert && <Alert  className="alert" variant="filled" severity="error">Vous n'avez sélectionné aucune Playlist</Alert>}
     </div>
   )
 }

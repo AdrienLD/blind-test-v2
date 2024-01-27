@@ -77,7 +77,7 @@ function BlindGame() {
 
   return (
     <div>
-      <h1>BlindGame Musique : {musiqueActuelle}</h1>
+      <h2>BlindGame Musique : {musiqueActuelle}</h2>
       {
         affichage <= 2? <div className='VisuelQuestion'>
           <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
