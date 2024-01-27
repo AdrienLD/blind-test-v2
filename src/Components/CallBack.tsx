@@ -51,7 +51,7 @@ function CallBack() {
 
   const extractmusique = async () => {
     await console.log('extractmusique')
-    await getSpotifyToken('gettoken')
+    await getSpotifyToken()
     const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]')
     console.log('playlistSelection', playlistSelection)
     const playlistComplete: Musique[][] = []
