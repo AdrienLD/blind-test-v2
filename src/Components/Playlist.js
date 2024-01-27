@@ -28,8 +28,7 @@ const fetchOptions = (method, body = null) => ({
 
 const API_URL = 'http://localhost:4000/api'
 
-export async function getSpotifyToken(action) {
-
+async function SpotifyToken(action){
   try {
     const response = await fetch(`${API_URL}/gettoken`, fetchOptions('POST', { action, code: window.location.search.split('=')[1] }))
     const data = await response.json()
@@ -38,6 +37,11 @@ export async function getSpotifyToken(action) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error
   }
+}
+
+export async function getSpotifyToken() {
+  const result = await SpotifyToken('refreshToken')
+  if (!result.token) await SpotifyToken('gettoken')
 }
 
 export async function researchSpotify(recherche, type) {
@@ -69,7 +73,7 @@ export async function testSpotifyToken() {
   try {
     const response = await fetch(`${API_URL}/testtoken`, fetchOptions('GET'))
     const data = await response.json()
-    if (data.error?.status === 401) await getSpotifyToken('refresh_token')
+    if (data.error?.status === 401) await getSpotifyToken()
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error
