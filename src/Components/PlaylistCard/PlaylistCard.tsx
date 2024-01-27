@@ -10,7 +10,6 @@ export interface PlaylistCardProps {
 }
 
 function PlaylistCard(props: PlaylistCardProps) {
-  console.log(props.nom, props.genre)
   const imagePath = `/images/${props.genre} - ${props.nom}.jpg`
   
   const handleImageError = (e:any) => {
