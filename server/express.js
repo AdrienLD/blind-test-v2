@@ -29,7 +29,7 @@ app.post('/api/gettoken', async (req, res) => {
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
   action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/callback') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
-
+  console.log(CLIENT_ID, CLIENT_SECRET)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
     'Content-Type': 'application/x-www-form-urlencoded'

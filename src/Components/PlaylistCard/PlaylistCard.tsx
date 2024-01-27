@@ -1,6 +1,5 @@
 import React from 'react'
 import './PlaylistCard.css'
-import transparent from '../Images/trans.png'
 import DoneIcon from '@mui/icons-material/Done'
 
 export interface PlaylistCardProps {
@@ -16,7 +15,7 @@ function PlaylistCard(props: PlaylistCardProps) {
   
   const handleImageError = (e:any) => {
     e.target.onerror = null // Pour éviter une boucle infinie en cas d'erreur sur l'image de remplacement
-    e.target.src = transparent
+    e.target.src = '/images/trans.png'
   }
 
   return (

@@ -2,6 +2,8 @@
  * @type {[string, string[]][]}
  */
 
+
+
 export const playlist = [
   [ 'Années' , [ '50', '60', '70', '80', '90', '2000', '2010', '2020', '2023' ] ],
   [ 'Genres' , [ 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde' ] ],
@@ -10,6 +12,8 @@ export const playlist = [
   [ 'Langues' , [ 'Chanson française', 'Rock Français', 'Rap Français' ] ],
   [ 'Ajouter' , [ 'Ajouter une playlist' ] ]
 ]
+
+export const secretKey = 'meilleur'
 
 const headers = {
   'Content-Type': 'application/json'

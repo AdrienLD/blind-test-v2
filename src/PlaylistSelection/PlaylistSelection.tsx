@@ -2,10 +2,10 @@ import React from 'react'
 import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
-import FileUploadIcon from '@mui/icons-material/FileUpload'
-import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import ClearIcon from '@mui/icons-material/Clear'
-import { playlist } from '../Components/Playlist'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { playlist, secretKey } from '../Components/Playlist'
+import CryptoJS from 'crypto-js'
+
 
 export interface Musique {
   titre: string
@@ -75,6 +75,8 @@ const PlaylistSelection: React.FC = () => {
         
         
     localStorage.setItem('mode', mode)
+    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(PlaylistsSelectionnees), secretKey).toString()
+    console.log(ciphertext)
     await localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
     window.location.href = 'http://localhost:4000/api/start-auth' // Remplacez par l'URL de votre serveur
   }
@@ -89,6 +91,12 @@ const PlaylistSelection: React.FC = () => {
     setPlaylistsSelectionnees([])
   }
 
+  const deleteThisPlaylist = (playlistToDelete: string) => {
+    setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlistToDelete))
+  }
+
+
+
   return (
     <div className='PlaylistSelection'>
       <div className="TitreChoix">
@@ -96,7 +104,7 @@ const PlaylistSelection: React.FC = () => {
       </div>
       <div className="listPlaylists">
                 
-        <div>
+        <div className='catalogue'>
           {
             ListPlaylists.map((playlist) => (
               <ListPlaylistCard {...playlist} />
@@ -115,30 +123,45 @@ const PlaylistSelection: React.FC = () => {
           }
                     
         </div>
-      </div>
-      <div className="Selection">
-        <div className="ListPlaylistCard">
-                    Selection :
-        </div>
-        <div className="cartesSelectionnees">
-          {
-            PlaylistsSelectionnees.map((playlist) => {
-              return <div className='cartes'>{playlist.split(`£ `)[1]}</div>
-            })
-          }
-        </div>
-        <div className="Validations">
-          <button onClick={() => clearList()}><ClearIcon/></button>
-          <button onClick={() => exportmusique()}><FileUploadIcon/></button>
-          <button onClick={onImportClick}><FileDownloadIcon/></button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileUpload} 
-            style={{ display: 'none' }} 
-          />
-          <button onClick={() => extractmusique('blind')}>Blind Test</button>
-          <button onClick={() => extractmusique('nplp')}>N'Oubliez PLP</button>
+        <div className="panneaudroite">
+          
+          <div className="Selection">
+            <div className="Carte_Selection">
+            Selection
+              <button onClick={() => clearList()} className='DeleteIconsButon'><DeleteIcon/></button>
+            </div>
+            <div className="cartesSelectionnees">
+              {
+                PlaylistsSelectionnees.map((playlist) => {
+                  return <div className='cartes'>
+                    <img src={`/images/${playlist.split(' £ ')[0]} - ${playlist.split(' £ ')[1]}.jpg`} 
+                      alt="logo" 
+                      className='logoPlaylist'
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.src = '/images/trans.png'
+                      }}/>                    {playlist.replace(` £ `,' - ')}
+                    <div onClick={() => deleteThisPlaylist(playlist)} className='DeletePlaylist'>
+                      <DeleteIcon className='DeletePlaylistIcon'/>
+                    </div>
+                  </div>
+                })
+              }
+            </div>
+            <div className="Validations">
+              <button onClick={() => exportmusique()}>Exporter</button>
+              <button onClick={onImportClick}>Importer</button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+                style={{ display: 'none' }} 
+              />
+            </div>
+            <button onClick={() => extractmusique('blind')}>Blind Test</button>
+            <button onClick={() => extractmusique('nplp')}>N'Oubliez PLP</button>
+          </div>
+          <button className="Start">Start</button>
         </div>
       </div>
 
