@@ -29,7 +29,6 @@ app.post('/api/gettoken', async (req, res) => {
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
   action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/callback') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
-  console.log(CLIENT_ID, CLIENT_SECRET)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -58,7 +57,7 @@ app.post('/api/gettoken', async (req, res) => {
 app.get('/api/testtoken', async (req, res) => {
   try {
     const token = req.cookies.token
-    console.log(token, 'test')
+    console.log('test')
     const response = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'GET',
       headers: {
@@ -170,6 +169,27 @@ app.get('/api/getlyricsId', async (req, res) => {
       method: 'GET'
     })
     const data = await response.json()
+    res.json(data)
+  } catch (error) {
+    console.error('Error fetching player state:', error)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
+app.post('/api/newplaylist', async (req, res) => {
+  const { playlistId } = req.body
+  try {
+    const token = req.cookies.token
+    console.log('newPlaylist')
+    const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const data = await response.json()
+    console.log(data)
     res.json(data)
   } catch (error) {
     console.error('Error fetching player state:', error)

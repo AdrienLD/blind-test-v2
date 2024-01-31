@@ -3,7 +3,7 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { playlist, secretKey } from '../Components/Playlist'
+import { playlist, searchNewSpotifyPlaylist, secretKey } from '../Components/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
@@ -104,7 +104,7 @@ const PlaylistSelection: React.FC = () => {
   }
 
   const handleClose = () => {
-    setOpen(false);
+    setOpen(false)
   }
 
   const openDialog = () => {
@@ -184,6 +184,7 @@ const PlaylistSelection: React.FC = () => {
           <button className="Start" onClick={() => openDialog()}>Start</button>
         </div>
       </div>
+      <button className="Start" onClick={() => searchNewSpotifyPlaylist('37i9dQZF1DX0QqahDuqmRY')}>Start</button>
       <DialogGameChoice open={open} onClose={handleClose} extractmusique={extractmusique} />
       {showAlert && <Alert  className="alert" variant="filled" severity="error">Vous n'avez sélectionné aucune Playlist</Alert>}
     </div>
