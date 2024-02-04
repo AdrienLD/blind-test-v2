@@ -59,11 +59,12 @@ export async function researchSpotify(recherche, type) {
   }
 }
 
-export async function extractMusiquesSpotify(playlistId) {
+export async function extractMusiquesSpotify(playlistId, offset) {
   await testSpotifyToken()
   try {
-    const response = await fetch(`${API_URL}/tracks`, fetchOptions('POST', { playlistId }))
+    const response = await fetch(`${API_URL}/tracks`, fetchOptions('POST', { playlistId, offset }))
     const data = await response.json()
+    console.log('tracks', data)
     return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
@@ -78,6 +79,7 @@ export async function testSpotifyToken() {
     const data = await response.json()
     console.log('test')
     if (data.error?.status === 401 || !data) await getSpotifyToken()
+    else return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error
