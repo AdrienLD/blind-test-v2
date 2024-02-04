@@ -3,12 +3,13 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { playlist, secretKey } from '../Components/Playlist'
+import { getSpotifyToken, playlist, secretKey } from '../Components/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
 import DialogGameChoice from '../Components/Dialog/DialogGameChoice/DialogGameChoice'
 import DialogNewPlaylist from '../Components/Dialog/DialogNewPlaylist/DialogNewPlaylist'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -37,6 +38,9 @@ const PlaylistSelection: React.FC = () => {
     return playlistsJson ? JSON.parse(playlistsJson) : []
   })
 
+  const navigate = useNavigate()
+
+  const isTokenFetched = React.useRef(false)
   React.useEffect(() => {
     setPlaylistsAfficher(userPlaylist)
   }, [ userPlaylist ])
@@ -59,7 +63,12 @@ const PlaylistSelection: React.FC = () => {
     setPlaylistsAfficher(playlistSelections[0])
   }, [])
 
-
+  React.useEffect(() => {
+    if (!isTokenFetched.current) {
+      getSpotifyToken()
+      isTokenFetched.current = true
+    }
+  }, [])
   
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   
@@ -134,6 +143,7 @@ const PlaylistSelection: React.FC = () => {
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(PlaylistsSelectionnees), secretKey).toString()
     await localStorage.setItem('playlistscryptées', ciphertext)
     await localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
+    navigate('/callback')
   }
   
   const onImportClick = () => {

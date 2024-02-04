@@ -8,14 +8,11 @@
 
 - [ ] Differents Game modes Blind test ( chrono, button...)
 
-- [ ] Better CSS
-
-- [ ] CSS to SASS
-
 - [ ] Plus beau compte à rebours
 - [ ] Corriger erreurs lecture Spotify
 - [ ] Forcer certaines playlists 
 - [ ] Plus tard : musiques séries auto trouver la série 
 - [ ] Chercher parmi les +100 premières musiques 
-- [ ] Stocker playlist cryptée forever (local storage ou cookie) ?
+- [x] Stocker playlist forever (local storage ou cookie) ?
+- [ ] playlist crypté
 - [X] Switch mode de jeu => utilisation d'un modal

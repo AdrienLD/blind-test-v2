@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../PlaylistSelection/PlaylistSelection'
-import { extractMusiquesSpotify, getSpotifyToken, researchSpotify } from './Playlist'
+import { extractMusiquesSpotify, researchSpotify } from './Playlist'
 
 
 function CallBack() {
@@ -51,7 +51,6 @@ function CallBack() {
 
   const extractmusique = async () => {
     await console.log('extractmusique')
-    await getSpotifyToken()
     const playlistSelection: string[] = JSON.parse(localStorage.getItem('playlists') || '[]')
     console.log('playlistSelection', playlistSelection)
     const playlistComplete: Musique[][] = []
