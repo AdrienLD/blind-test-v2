@@ -76,7 +76,7 @@ export async function testSpotifyToken() {
   try {
     const response = await fetch(`${API_URL}/testtoken`, fetchOptions('GET'))
     const data = await response.json()
-    console.log('test', data, response)
+    console.log('test')
     if (data.error?.status === 401 || !data) await getSpotifyToken()
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
@@ -87,7 +87,7 @@ export async function testSpotifyToken() {
 export async function getSpotifyAction(commande, method) {
   await testSpotifyToken()
   try {
-    await fetch(`${API_URL}/playpause`, {
+    const response = await fetch(`${API_URL}/playpause`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -96,6 +96,14 @@ export async function getSpotifyAction(commande, method) {
       },
       credentials: 'include'
     })
+    if (response.ok && response.status !== 204) {
+      const data = await response.json()
+      console.log(data)
+      return data
+    } else {
+      console.log('Réponse réussie sans corps de contenu.')
+      
+    }
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error

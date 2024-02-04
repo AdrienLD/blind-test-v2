@@ -21,9 +21,7 @@ const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 app.post('/api/gettoken', async (req, res) => {
-  console.log(CLIENT_ID, CLIENT_SECRET)
   const action = req.body.action
-  console.log(action)
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
@@ -33,7 +31,6 @@ app.post('/api/gettoken', async (req, res) => {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
     'Content-Type': 'application/x-www-form-urlencoded'
   }
-  console.log('params', params, headers)
 
   try {
     const response = await fetch('https://accounts.spotify.com/api/token', {
@@ -45,8 +42,6 @@ app.post('/api/gettoken', async (req, res) => {
     const data = await response.json()     
     if (data.access_token) res.cookie('token', data.access_token, { httpOnly: true })
     if (data.refresh_token) res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
-    console.log(data)
-    console.log('data', data)
     res.send(data)
   } catch (error) {
     console.error('Error fetching access token:', error.message)
@@ -79,7 +74,7 @@ app.post('/api/research', async (req, res) => {
 
   try {
     const token = req.cookies.token
-    console.log(token, 'research')
+    console.log('research')
     const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
       method: 'GET',
       headers: {
@@ -98,7 +93,7 @@ app.post('/api/tracks', async (req, res) => {
   const { playlistId } = req.body
   try {
     const token = req.cookies.token
-    console.log(token, 'tracks')
+    console.log('tracks')
     const response = await nodeFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
       method: 'GET',
       headers: {
@@ -116,7 +111,7 @@ app.post('/api/tracks', async (req, res) => {
 app.get('/api/getplayerstate', async (req, res) => {
   try {
     const token = req.cookies.token
-    console.log(token, 'getplayserestat')
+    console.log('getplayserestat')
     const response = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'GET',
       headers: {
@@ -142,7 +137,7 @@ app.get('/api/playpause', async (req, res) => {
   const method = req.headers.method
   try {
     const token = req.cookies.token
-    console.log(token, 'playpause')
+    console.log('playpause')
     const response = await fetch(`https://api.spotify.com/v1/me/player/${commande}`, {
       method: method,
       headers: {
@@ -150,9 +145,14 @@ app.get('/api/playpause', async (req, res) => {
       }
     })
 
-    const data = await response.json()
-
-    res.json(data)
+    if (response.ok && response.status !== 204) {
+      const data = await response.json()
+      console.log(data)
+      res.json(data)
+    } else {
+      console.log('Réponse réussie sans corps de contenu.')
+      res.status(response.status).send('Réponse sans contenu')
+    }
   } catch (error) {
     console.error('Error fetching player state:', error)
     res.status(500).send('Internal Server Error')
