@@ -1,22 +1,33 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './BlindGame.sass'
 import Countdown from '../VisuelQuestion/Countdown/Countdown'
-import { getSpotifyAction } from '../Playlist'
+import { getSpotifyAction, secretKey } from '../Playlist'
+import CryptoJS from 'crypto-js'
 
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
   const [ affichage, setAffichage ] = React.useState(0)
   const [ entrainement, setEntrainement ] = React.useState(false)
-  
+  const navigate = useNavigate()
+  const [ receivedData, setReceivedData ] = React.useState<Musique[]>([])
+
   React.useEffect(() => {
     const modeEntrainement = localStorage.getItem('mode') === 'entrainement'
     setEntrainement(modeEntrainement)
+    const ciphertext = localStorage.getItem('playlistFinale')
+    if (ciphertext) {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey)
+      const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
+      console.log('decryptedData', JSON.parse(decryptedData))
+      setReceivedData(JSON.parse(decryptedData)) 
+    } else {
+      console.error('No playlist found in local storage')
+      return
+    }
+    
   }, [])
-  
-  const location = useLocation()
-  const receivedData: Musique[] = location.state?.playlist
 
   function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -38,7 +49,6 @@ function BlindGame() {
   const response = async () => {
     if (!entrainement) {
       await getSpotifyAction('play', 'PUT')
-
     } else {
       const utterance = new SpeechSynthesisUtterance(`${receivedData[musiqueActuelle].titre} de ${receivedData[musiqueActuelle].artiste}`)
       const allVoices = window.speechSynthesis.getVoices()
@@ -66,6 +76,15 @@ function BlindGame() {
     await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
     await sleep(100)
     await getSpotifyAction('next', 'POST')
+    await sleep(100)
+    let musiqueactuelle = await getSpotifyAction('currently-playing', 'GET')
+    await sleep(100)
+    while (musiqueactuelle.item.id !== receivedData[musiqueActuelle].id) {
+      await getSpotifyAction('next', 'POST')
+      await sleep(100)
+      musiqueactuelle = await getSpotifyAction('currently-playing', 'GET')
+      await sleep(100)
+    }
     await sleep(5000)
     if (!entrainement) {
       await setAffichage(1)
@@ -77,9 +96,11 @@ function BlindGame() {
 
   return (
     <div>
-      <h2>BlindGame Musique : {musiqueActuelle}</h2>
+      <h2>BlindGame Musique : {musiqueActuelle}
+        <button onClick={() => navigate('/ChoosePlaylist')}>Retour à la sélection : </button>
+      </h2>
       {
-        affichage <= 2? <div className='VisuelQuestion'>
+        receivedData.length === 0 ? <div>Chargement...</div>: affichage <= 2? <div className='VisuelQuestion'>
           <img src={receivedData[musiqueActuelle].playlistimg} alt='pochette playlist' className='PochetteAlbum' />
           <div className="infos">
             <p className='TitrePlaylist'>Playlist : {receivedData[musiqueActuelle].playlist}</p>

@@ -9,10 +9,10 @@
 - [ ] Differents Game modes Blind test ( chrono, button...)
 
 - [ ] Plus beau compte à rebours
-- [ ] Corriger erreurs lecture Spotify
+- [x] Corriger erreurs lecture Spotify
 - [ ] Forcer certaines playlists 
 - [ ] Plus tard : musiques séries auto trouver la série 
 - [ ] Chercher parmi les +100 premières musiques 
 - [x] Stocker playlist forever (local storage ou cookie) ?
-- [ ] playlist crypté
+- [x] playlist crypté
 - [X] Switch mode de jeu => utilisation d'un modal
