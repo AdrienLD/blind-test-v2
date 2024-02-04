@@ -97,3 +97,18 @@ export async function getSpotifyAction(commande, method) {
     throw error
   }
 }
+
+export async function searchNewSpotifyPlaylist(playlistId) {
+  await testSpotifyToken()
+  try {
+    console.log('Search')
+    const retour = await fetch(`${API_URL}/newplaylist`, fetchOptions('POST', { playlistId }))
+    console.log('finish search')
+    const data = await retour.json()
+    console.log(retour, data)
+  } catch (error) {
+    console.error('Erreur lors de l\'échange du code:', error)
+    throw error
+  }
+}
+
