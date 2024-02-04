@@ -27,7 +27,7 @@ app.post('/api/gettoken', async (req, res) => {
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
-  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/callback') : null
+  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/ChoosePlaylist') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
@@ -46,6 +46,7 @@ app.post('/api/gettoken', async (req, res) => {
     if (data.access_token) res.cookie('token', data.access_token, { httpOnly: true })
     if (data.refresh_token) res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
     console.log(data)
+    console.log('data', data)
     res.send(data)
   } catch (error) {
     console.error('Error fetching access token:', error.message)

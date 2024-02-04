@@ -1,13 +1,9 @@
 
 
 .description{
-  top: 200px;
   font-size: 20px;
   text-align: justify;
-  text-wrap: wrap;
   width: 70%;
-  margin: 0 auto;
-  min-height: 100%;
   overflow: auto;
 }
 
