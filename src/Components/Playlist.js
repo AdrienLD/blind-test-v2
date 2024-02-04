@@ -9,8 +9,11 @@ export const playlist = [
   [ 'Genres' , [ 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde' ] ],
   [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga' ] ],
   [ 'Télévision' , [ 'Films', 'Gen Séries TV', 'Dessins animés', 'Anime OST', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités' ] ],
-  [ 'Langues' , [ 'Chanson française', 'Rock Français', 'Rap Français' ] ],
-  [ 'Ajouter' , [ 'Ajouter une playlist' ] ]
+  [ 'Langues' , [ 'Chanson française', 'Rock Français', 'Rap Français' ] ]
+]
+
+export const playlistUtilisateur = [
+  []
 ]
 
 export const secretKey = 'meilleur'
@@ -73,7 +76,8 @@ export async function testSpotifyToken() {
   try {
     const response = await fetch(`${API_URL}/testtoken`, fetchOptions('GET'))
     const data = await response.json()
-    if (data.error?.status === 401) await getSpotifyToken()
+    console.log('test', data, response)
+    if (data.error?.status === 401 || !data) await getSpotifyToken()
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error
@@ -105,7 +109,8 @@ export async function searchNewSpotifyPlaylist(playlistId) {
     const retour = await fetch(`${API_URL}/newplaylist`, fetchOptions('POST', { playlistId }))
     console.log('finish search')
     const data = await retour.json()
-    console.log(retour, data)
+    console.log('data', data)
+    return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error

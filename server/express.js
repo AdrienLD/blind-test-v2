@@ -64,10 +64,7 @@ app.get('/api/testtoken', async (req, res) => {
         'Authorization': `Bearer ${token}`
       }
     })
-
-    if (response) {
-      res.json({ response })
-    }
+    return res.json(await response.json())
   } catch (error) {
     console.error('Error fetching player state:', error)
     res.status(500).send('Internal Server Error')
@@ -208,7 +205,7 @@ app.get('/api/start-auth', (req, res) => {
     'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
   ]
 
-  const REDIRECT_URI = 'http://localhost:3000/callback'
+  const REDIRECT_URI = 'http://localhost:3000/ChoosePlaylist'
   const CLIENT_ID = process.env.CLIENT_ID
   
   const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${spotifyScopes.join('%20')}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`

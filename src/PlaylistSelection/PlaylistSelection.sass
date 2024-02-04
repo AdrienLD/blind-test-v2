@@ -1,20 +1,12 @@
-.logo
-    position: fixed
-    top: 10px
-    left: 50%
-    transform: translateX(-50%)
-    width: 300px
-    height: auto
 
 .PlaylistSelection
     display: flex
     flex-direction: column
-    margin-top: 190px
 
     .listPlaylists 
         display: flex
         flex-direction: row
-        margin-top: 20px
+        margin-top: 130px
 
         .catalogue
             width: 250px
@@ -37,7 +29,7 @@
 
             .Selection
                 width: 300px
-                top: 210px
+                top: 240px
                 bottom: 90px
                 height: auto
                 position: fixed
@@ -74,6 +66,7 @@
                         display: grid
                         grid-template-columns: 40px 1fr 25px
                         gap: 10px
+                        height: 40px
                         margin-bottom: 10px
                         background: rgba( 255, 255, 255, 0.15 )
                         box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 )
@@ -84,6 +77,11 @@
                         color: rgb(255, 255, 255)
                         padding: 5px
                         align-items: center
+                        .nomplaylistselection
+                            display: flex
+                            align-items: center
+                            height: 38px
+                            overflow: hidden
                         img
                             width: 100%
                             border-radius: 10%
@@ -107,3 +105,9 @@
                 font-size: 50px
                 &:hover
                     background: rgba(4, 75, 0, 0.751)
+    .UserPlaylist
+        position: fixed
+        margin: 0 0
+        width: 250px
+        left: 20px
+        bottom: 15px

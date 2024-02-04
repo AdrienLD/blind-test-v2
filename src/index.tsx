@@ -8,6 +8,7 @@ import Logo from './Components/Images/Songs-logo.png'
 import BlindGame from './Components/BlindGame/BlindGame'
 import CallBack from './Components/CallBack'
 import PLParoles from './Components/PLParoles/PLParoles'
+import App from './App'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,14 +16,18 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <img className='logo' src={Logo} alt="logo" />
-    <Router>
-      <Routes>
-        <Route path="/" element={<PlaylistSelection />} />
-        <Route path="/callback" element={<CallBack/>} />
-        <Route path="/BlindGame" element={<BlindGame/>} />
-        <Route path='/PLParoles' element={<PLParoles/>} />
-      </Routes>
-    </Router>
+    <div className="content">
+      
+      <Router>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/ChoosePlaylist" element={<PlaylistSelection />} />
+          <Route path="/callback" element={<CallBack/>} />
+          <Route path="/BlindGame" element={<BlindGame/>} />
+          <Route path='/PLParoles' element={<PLParoles/>} />
+        </Routes>
+      </Router>
+    </div>
   </React.StrictMode>
 )
 
