@@ -1,10 +1,10 @@
 # Todo List
 
-- [ ] Add Playlists
-    - Add selection windows
-    - Add research
-    - Add to Playlist
-    - Add to save ?????
+- [x] Add Playlists
+    - [x] Add selection windows
+    - [x] Add research
+    - [x] Add to Playlist
+    - [x] Add to save ?????
 
 - [ ] Differents Game modes Blind test ( chrono, button...)
 

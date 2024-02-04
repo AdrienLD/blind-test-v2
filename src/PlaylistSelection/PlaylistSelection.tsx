@@ -3,11 +3,12 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { playlist, searchNewSpotifyPlaylist, secretKey } from '../Components/Playlist'
+import { playlist, secretKey } from '../Components/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
-import DialogGameChoice from '../Components/DialogGameChoice/DialogGameChoice'
+import DialogGameChoice from '../Components/Dialog/DialogGameChoice/DialogGameChoice'
+import DialogNewPlaylist from '../Components/Dialog/DialogNewPlaylist/DialogNewPlaylist'
 
 
 
@@ -24,30 +25,66 @@ export interface Musique {
 
 const PlaylistSelection: React.FC = () => {
   const [ open, setOpen ] = React.useState(false)
+  const [ openNewPlaylist, setOpenNewPlaylist ] = React.useState(false)
   const [ showAlert, setShowAlert ] = React.useState(false)
+  const [ userPlaylist, setUserPlaylist ] = React.useState<[string, string[]]>([ 'UserPlaylist', [ 'Ajouter' ] ])
+  const [ userPlaylistInfos, setUserPlaylistInfos ] = React.useState<string[][]>(localStorage.getItem('userPlaylistInfos') ? JSON.parse(localStorage.getItem('userPlaylistInfos') as string) : [ [ 'Ajouter', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/1200px-PlusCM128.svg.png', '' ] ])
+  const playlistSelections = playlist
+  const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState<[string, string[]]>(playlistSelections[0])
+
+  const [ PlaylistsSelectionnees, setPlaylistsSelectionnees ] = React.useState<string[]>(() => {
+    const playlistsJson = localStorage.getItem('playlists')
+    return playlistsJson ? JSON.parse(playlistsJson) : []
+  })
+
+  React.useEffect(() => {
+    setPlaylistsAfficher(userPlaylist)
+  }, [ userPlaylist ])
+
+  React.useEffect(() => {
+    const playlist = localStorage.getItem('playlists')
+    if (playlist) {
+      console.log('playlist', playlist)
+      setPlaylistsSelectionnees(JSON.parse(playlist))
+    }
+  }, [])
+
+  React.useEffect(() => {
+    localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
+  }, [ PlaylistsSelectionnees ])
+
+  React.useEffect(() => {
+    const nomsPlaylists = userPlaylistInfos.map(playlist => playlist[0])
+    setUserPlaylist([ 'UserPlaylist', nomsPlaylists ])
+    setPlaylistsAfficher(playlistSelections[0])
+  }, [])
+
 
   
-  const playlistSelections = playlist
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   
-  const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState<[string, string[]]>(playlistSelections[0])
+
+  React.useEffect(() => {
+    localStorage.setItem('userPlaylistInfos', JSON.stringify(userPlaylistInfos))
+  }, [ userPlaylistInfos ])
 
   const ListPlaylists: ListPlaylistCardProps[] = playlistSelections.map((selection): ListPlaylistCardProps => ({
     nom: selection[0],
     onHover: () => { setPlaylistsAfficher(selection) }
   }))
 
-  const [ PlaylistsSelectionnees, setPlaylistsSelectionnees ] = React.useState<string[]>([])
-
 
   const addNewPlaylist = (listplaylist: string, playlist: string) => {
     const playlists = `${listplaylist} £ ${playlist}`
-    if (!PlaylistsSelectionnees.includes(playlists)) {
-      setPlaylistsSelectionnees(PlaylistsSelectionnees.concat(playlists))
-      setShowAlert(false)
-    } else {
-      setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlists))
-    }
+    if (playlists === 'UserPlaylist £ Ajouter') {
+      setOpenNewPlaylist(true)
+    } else
+      if (!PlaylistsSelectionnees.includes(playlists)) {
+        setPlaylistsSelectionnees(PlaylistsSelectionnees.concat(playlists))
+        setShowAlert(false)
+      } else {
+        setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlists))
+      }
   }
 
   const exportmusique = (): void => {
@@ -72,6 +109,17 @@ const PlaylistSelection: React.FC = () => {
 
   }
 
+  const  addNewUserPlaylist = async (playlist: any) => {
+    
+    setOpenNewPlaylist(false)
+    await setUserPlaylist(userPlaylist => {
+      const updatedFirstElement = userPlaylist[0]
+      const updatedSecondElement = [ ...userPlaylist[1], playlist.name ]
+      return [ updatedFirstElement, updatedSecondElement ]
+    })
+    setUserPlaylistInfos(userPlaylistInfos.concat([ [ playlist.name, playlist.images[0].url, playlist.id ] ]) )
+  }
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files && files[0]) {
@@ -84,9 +132,8 @@ const PlaylistSelection: React.FC = () => {
         
     localStorage.setItem('mode', mode)
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(PlaylistsSelectionnees), secretKey).toString()
-    console.log(ciphertext)
+    await localStorage.setItem('playlistscryptées', ciphertext)
     await localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
-    window.location.href = 'http://localhost:4000/api/start-auth' // Remplacez par l'URL de votre serveur
   }
   
   const onImportClick = () => {
@@ -116,10 +163,29 @@ const PlaylistSelection: React.FC = () => {
     }
   }
 
+  const getImageSelection = (playlist: string) => {
+    const [ genre, playlistName ] = playlist.split(' £ ')
+    console.log(genre, playlistName)
+    if (genre === 'UserPlaylist') {
+      return userPlaylistInfos.find(playlist => playlist[0] === playlistName)?.[1]
+    }
+    return `/images/${genre} - ${playlistName}.jpg`
+  }
+
+  const cutString = (searchString: string) => {
+    let string = searchString.replace(` £ `,' - ')
+    if (string.length< 48)  return string
+    string = string.slice(0, 47)
+    const lastIndexOf = string.lastIndexOf(' ')
+    if (lastIndexOf > 40 ) {
+      return string
+    }
+    return string.slice(0, lastIndexOf) + '...'
+  }
+
 
   return (
     <div className='PlaylistSelection'>
-
       <h2>
                 Choisissez les playlists que vous voulez avoir dans votre BlindTest
       </h2>
@@ -131,6 +197,8 @@ const PlaylistSelection: React.FC = () => {
               <ListPlaylistCard {...playlist} />
             ))
           }
+          <button className="ListPlaylistCard UserPlaylist" onClick={() => setPlaylistsAfficher(userPlaylist)}>Mes playlists</button>
+
         </div>
         <div className="PlaylistsPossibles">
           {
@@ -148,21 +216,23 @@ const PlaylistSelection: React.FC = () => {
           
           <div className="Selection">
             <div className="Carte_Selection">
-            Selection
+              Selection
               <button onClick={() => clearList()} className='DeleteIconsButon'><DeleteIcon/></button>
             </div>
             <div className="cartesSelectionnees">
               {
                 PlaylistsSelectionnees.map((playlist) => {
                   return <div className='cartes'>
-                    <img src={`/images/${playlist.split(' £ ')[0]} - ${playlist.split(' £ ')[1]}.jpg`} 
+                    <img src={getImageSelection(playlist)} 
                       alt="logo" 
                       className='logoPlaylist'
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.src = '/images/trans.png'
                       }}/>                    
-                    {playlist.replace(` £ `,' - ')}
+                    <div className="nomplaylistselection">
+                      {cutString(playlist)}
+                    </div>
                     <div onClick={() => deleteThisPlaylist(playlist)} className='DeletePlaylist'>
                       <DeleteIcon className='DeletePlaylistIcon'/>
                     </div>
@@ -184,8 +254,8 @@ const PlaylistSelection: React.FC = () => {
           <button className="Start" onClick={() => openDialog()}>Start</button>
         </div>
       </div>
-      <button className="Start" onClick={() => searchNewSpotifyPlaylist('37i9dQZF1DX0QqahDuqmRY')}>Start</button>
       <DialogGameChoice open={open} onClose={handleClose} extractmusique={extractmusique} />
+      <DialogNewPlaylist open={openNewPlaylist} onClose={() => setOpenNewPlaylist(false)} addNewUserPlaylist={addNewUserPlaylist} />
       {showAlert && <Alert  className="alert" variant="filled" severity="error">Vous n'avez sélectionné aucune Playlist</Alert>}
     </div>
   )
