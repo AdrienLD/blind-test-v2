@@ -1,3 +1,5 @@
+
+/*
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
@@ -200,7 +202,7 @@ function PLParoles() {
           <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
           <div className="infos">
             <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
-            {affichage === 0 ? <Countdown onFinish={() => startmusique()} timer={0} />: <div>
+            {affichage === 0 ? <Countdown />: <div>
               {lyricsJSX}
               <button onClick={() => nextmusique()}>Passer</button>
               <button onClick={() => response()}>Réponse</button>
@@ -223,6 +225,17 @@ function PLParoles() {
       }
     </div>
   )
+}
+
+export default PLParoles
+  */
+function PLParoles() {
+  return (
+    <div>
+      <h1>PLParoles</h1>
+    </div>
+  )
+
 }
 
 export default PLParoles

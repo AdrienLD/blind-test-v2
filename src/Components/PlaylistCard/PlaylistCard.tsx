@@ -10,7 +10,7 @@ export interface PlaylistCardProps {
 }
 
 function PlaylistCard(props: PlaylistCardProps) {
-  const imagePath = `/images/${props.genre} - ${props.nom}.jpg`
+  const imagePath = `/images/playlists/${props.genre} - ${props.nom}.jpg`
   const userPlaylistInfos: Array<[string, string, string]> = [ localStorage.getItem('userPlaylistInfos') ? JSON.parse(localStorage.getItem('userPlaylistInfos') as string) : null ]
 
   const imageafficher = (props.genre === 'UserPlaylist' && userPlaylistInfos) ? userPlaylistInfos[0].find(playlist => playlist[0] === props.nom)?.[1] : imagePath

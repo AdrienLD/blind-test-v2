@@ -48,7 +48,9 @@ export async function getSpotifyToken() {
 }
 
 export async function researchSpotify(recherche, type) {
+  console.log('research')
   await testSpotifyToken()
+  console.log('test')
   try {
     const response = await fetch(`${API_URL}/research`, fetchOptions('POST', { titre: recherche, type }))
     const data = await response.json()

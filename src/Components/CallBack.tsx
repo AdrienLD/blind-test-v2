@@ -143,7 +143,7 @@ function CallBack() {
     const fetchData = async () => {
       const status = await testSpotifyToken()
       console.log('status', status)
-      if (!status.error) {
+      if (status && !status.error) {
         setIsSpotifyStart(true)
       }
       setTrySpotifyConnection(false)
@@ -161,13 +161,14 @@ function CallBack() {
   return (
     <div className='PlaylistSelection'>
             
-
-      {
-        isSpotifyStart? <div>Recherche en cours...</div>:<div>
+      <h2>
+        {
+          isSpotifyStart? <div>Recherche en cours...</div>:<div>
           Veuillez démarrer une musique sur Spotify puis appuyer sur le bouton
-          <button onClick={() => setTrySpotifyConnection(true)}>Extraire les musiques</button>
-        </div>
-      }
+            <button onClick={() => setTrySpotifyConnection(true)}>Extraire les musiques</button>
+          </div>
+        }
+      </h2>
     </div>
   )
 }

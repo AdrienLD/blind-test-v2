@@ -41,19 +41,15 @@ button {
 }
 
 .content{
-  top: 110px;
-  position: absolute;
   width: 100%;
-  text-align: center;
+  margin-top: 110px;
 }
 
 h2{
-  
+  width: 100%;
+  text-align: center;
   color: white;
   font-size: 40px;
   font-weight: bold;
-  
   position: fixed;
-  width: 100%;
-  margin-bottom: 100px;
 }

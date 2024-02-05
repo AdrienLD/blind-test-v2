@@ -21,6 +21,7 @@ const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 app.post('/api/gettoken', async (req, res) => {
+  console.log('gettoken')
   const action = req.body.action
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
@@ -53,7 +54,7 @@ app.post('/api/gettoken', async (req, res) => {
 
 app.get('/api/testtoken', async (req, res) => {
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('test')
     const response = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'GET',
@@ -76,7 +77,7 @@ app.post('/api/research', async (req, res) => {
     
 
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('research')
     const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
       method: 'GET',
@@ -95,7 +96,7 @@ app.post('/api/research', async (req, res) => {
 app.post('/api/tracks', async (req, res) => {
   const { playlistId, offset } = req.body
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('tracks')
     const response = await nodeFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${offset}`, {
       method: 'GET',
@@ -113,7 +114,7 @@ app.post('/api/tracks', async (req, res) => {
 
 app.get('/api/getplayerstate', async (req, res) => {
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('getplayserestat')
     const response = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'GET',
@@ -139,7 +140,7 @@ app.get('/api/playpause', async (req, res) => {
   const commande = req.headers.command
   const method = req.headers.method
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('playpause')
     const response = await fetch(`https://api.spotify.com/v1/me/player/${commande}`, {
       method: method,
@@ -180,7 +181,7 @@ app.get('/api/getlyricsId', async (req, res) => {
 app.post('/api/newplaylist', async (req, res) => {
   const { playlistId } = req.body
   try {
-    const token = req.cookies.token
+    const token = webtoken ?? req.cookies.token
     console.log('newPlaylist')
     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
       method: 'GET',

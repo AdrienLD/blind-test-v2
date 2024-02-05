@@ -7,10 +7,10 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 
-const basePath = '../../public/images/'
+const basePath = '../../public/images/playlists/'
 
 const requireplalist = async (titre, genre) => {
-  const data = await researchSpotify(`${genre} - ${titre}`, 'playlist')
+  const data = await researchSpotify(`${genre} ${titre}`, 'playlist')
   const savePath = path.join(__dirname, `${basePath}${genre} - ${titre}.jpg`)
   if (data.playlists && data.playlists.items) await downloadImage(data.playlists?.items[0]?.images[0].url, savePath)
   return data
