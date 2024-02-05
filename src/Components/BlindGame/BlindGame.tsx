@@ -42,8 +42,39 @@ function BlindGame() {
   
   const nextmusique = async () => {
     await getSpotifyAction('pause', 'PUT')
-    setMusiqueActuelle(musiqueActuelle + 1)
     setAffichage(0)
+    sleep(200)
+    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
+    await sleep(200)
+    const userNextMusic = await getSpotifyAction('queue', 'GET')
+    let queue = userNextMusic.queue
+    let indexMusicinQueue = -1
+    while (queue.length > 0 && indexMusicinQueue === -1) {
+      for (let index = 0; index < queue.length; index++) {
+        const element = queue[index]
+        if (element.id === receivedData[musiqueActuelle+1].id) {
+          indexMusicinQueue = index
+          break
+        }
+      }
+      if (indexMusicinQueue === -1) {
+        for (let index = 0; index < queue.length; index++) {
+          getSpotifyAction('next', 'POST')
+          getSpotifyAction('pause', 'PUT')
+        }
+        queue = (await getSpotifyAction('queue', 'GET')).queue
+      }
+    }
+    if (indexMusicinQueue === -1) {
+      console.error('Music not found in queue')
+      return
+    }
+    for (let index = 0; index <= indexMusicinQueue; index++) {
+      getSpotifyAction('next', 'POST')
+      getSpotifyAction('pause', 'PUT')
+    }
+    await getSpotifyAction('pause', 'PUT')
+    await setMusiqueActuelle(musiqueActuelle + 1)
   }
 
   const response = async () => {
@@ -73,18 +104,7 @@ function BlindGame() {
     }
   }
   const startmusique = async () => {
-    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
-    await sleep(100)
-    await getSpotifyAction('next', 'POST')
-    await sleep(100)
-    let musiqueactuelle = await getSpotifyAction('currently-playing', 'GET')
-    await sleep(100)
-    while (musiqueactuelle.item.id !== receivedData[musiqueActuelle].id) {
-      await getSpotifyAction('next', 'POST')
-      await sleep(100)
-      musiqueactuelle = await getSpotifyAction('currently-playing', 'GET')
-      await sleep(100)
-    }
+    await getSpotifyAction('play', 'PUT')
     await sleep(5000)
     if (!entrainement) {
       await setAffichage(1)

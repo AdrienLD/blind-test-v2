@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../PlaylistSelection/PlaylistSelection'
-import { extractMusiquesSpotify, researchSpotify, secretKey } from './Playlist'
+import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from './Playlist'
 import CryptoJS from 'crypto-js'
 
 interface Image {
@@ -20,7 +20,8 @@ function CallBack() {
 
   const isTokenFetched = React.useRef(false)
 
-
+  const [ isSpotifyStart, setIsSpotifyStart ] = React.useState(false)
+  const [ trySpotifyConnection, setTrySpotifyConnection ] = React.useState(true)
 
   function shuffle(array: Musique[]) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -78,6 +79,19 @@ function CallBack() {
     return playlistreseach.playlists.items[0]
   }
 
+  const recuperateAllMusic = async (playlistId: string) => {
+    let offset = 0
+    let musiques: any[] = []
+    let response = await extractMusiquesSpotify(playlistId, offset)
+    musiques = musiques.concat(response.items)
+    while (response.next) {
+      offset += 100
+      response = await extractMusiquesSpotify(playlistId, offset)
+      musiques = musiques.concat(response.items)
+    }
+    return musiques
+  }
+
   const extractmusique = async () => {
     await console.log('extractmusique')
     const playlistfromlocalStorage = localStorage.getItem('playlists')
@@ -93,10 +107,10 @@ function CallBack() {
       console.log('playlist', playlist)
       const playlistId = await extractplaylistId(playlist)
       console.log('playlistId', playlistId)
-      const musiques = await extractMusiquesSpotify(playlistId.id)
+      const musiques = await recuperateAllMusic(playlistId.id)
       console.log('musiques', musiques)
       playlistComplete.push([])
-      musiques.items.forEach((element: { track: {
+      musiques.forEach((element: { track: {
         duration_ms: any
         name: any
         artists: Array<{ name: any }>
@@ -126,15 +140,34 @@ function CallBack() {
   }
 
   React.useEffect(() => {
-    if (!isTokenFetched.current) {
+    const fetchData = async () => {
+      const status = await testSpotifyToken()
+      console.log('status', status)
+      if (!status.error) {
+        setIsSpotifyStart(true)
+      }
+      setTrySpotifyConnection(false)
+    }
+    if (trySpotifyConnection) fetchData()
+  }, [ trySpotifyConnection ])
+
+  React.useEffect(() => {
+    if (!isTokenFetched.current && isSpotifyStart) {
       extractmusique()
       isTokenFetched.current = true
     }
-  }, [])
+  }, [ isSpotifyStart ])
 
   return (
     <div className='PlaylistSelection'>
-            Recherche en cours...
+            
+
+      {
+        isSpotifyStart? <div>Recherche en cours...</div>:<div>
+          Veuillez démarrer une musique sur Spotify puis appuyer sur le bouton
+          <button onClick={() => setTrySpotifyConnection(true)}>Extraire les musiques</button>
+        </div>
+      }
     </div>
   )
 }
