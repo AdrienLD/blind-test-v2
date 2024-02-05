@@ -50,6 +50,7 @@ app.post('/api/gettoken', async (req, res) => {
 })
 
 
+
 app.get('/api/testtoken', async (req, res) => {
   try {
     const token = req.cookies.token
@@ -60,6 +61,8 @@ app.get('/api/testtoken', async (req, res) => {
         'Authorization': `Bearer ${token}`
       }
     })
+    console.log(response.status)
+    if (response.status === 204) return res.json({ error: { status: 401 } })
     return res.json(await response.json())
   } catch (error) {
     console.error('Error fetching player state:', error)
@@ -90,11 +93,11 @@ app.post('/api/research', async (req, res) => {
 })
 
 app.post('/api/tracks', async (req, res) => {
-  const { playlistId } = req.body
+  const { playlistId, offset } = req.body
   try {
     const token = req.cookies.token
     console.log('tracks')
-    const response = await nodeFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+    const response = await nodeFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${offset}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

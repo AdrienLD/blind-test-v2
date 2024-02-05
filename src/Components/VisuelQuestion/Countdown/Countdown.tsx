@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import './Countdown.css'
+import './Countdown.sass'
 
-function Countdown(props: any) {
-  const [ timeLeft, setTimeLeft ] = useState(props.timer)
+function Countdown() {
+  const [ timeLeft, setTimeLeft ] = useState(1000)
   const [ millisecondsLeft, setMillisecondsLeft ] = useState(1000)
-  const circumference = 2 * Math.PI * 70 // Rayon de 70
+  const circumference = 2 * Math.PI * 70 
   const strokeDashoffset = (millisecondsLeft / 1000) * circumference
 
   useEffect(() => {
     if (millisecondsLeft > 0) {
       const timer = setTimeout(() => {
         setMillisecondsLeft(millisecondsLeft - 10)
-      }, 10) // On diminue toutes les 10 millisecondes pour une précision plus grande
+      }, 10)
       return () => clearTimeout(timer)
-    } else if (timeLeft > 0){
+    } else if (timeLeft > 0) {
       setTimeLeft(timeLeft - 1)
       setMillisecondsLeft(1000)
-    } else {if (timeLeft === 0) props.onFinish()}
-  }, [ millisecondsLeft, timeLeft, props ])
+    }
+  }, [ millisecondsLeft, timeLeft ])
 
   return (
     <div className="countdown">
@@ -31,6 +31,7 @@ function Countdown(props: any) {
             fill="none"
             stroke="purple"
             strokeWidth="10"
+            
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             transform="rotate(-90, 84, 84)"
