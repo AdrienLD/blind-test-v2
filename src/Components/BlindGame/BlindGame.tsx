@@ -11,8 +11,10 @@ import { sleep } from './utils'
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
   const [ affichage, setAffichage ] = React.useState('Chargement')
+  const affichageRef = React.useRef(affichage)
   const navigate = useNavigate()
   const [ receivedData, setReceivedData ] = React.useState<Musique[]>([])
+  const [ spotifyEteint, setSpotifyEteint ] = React.useState(false)
 
   React.useEffect(() => {
     const ciphertext = localStorage.getItem('playlistFinale')
@@ -22,8 +24,24 @@ function BlindGame() {
       console.error('No playlist found in local storage')
       return
     }
+    const currentMusic = localStorage.getItem('CurrentMusic')
+    if (currentMusic) {
+      if (currentMusic === '0') setMusiqueActuelle(0)
+      else setMusiqueActuelle(parseInt(currentMusic)-1)
+    } else {
+      setMusiqueActuelle(0)
+    }
     
   }, [])
+
+  const getAction = async (action: string, method: string) => {
+    const response = await getSpotifyAction(action, method)
+    if (!response) return
+    if (response.status === 404) {
+      setSpotifyEteint(true)
+    }
+    return response
+  }
 
   React.useEffect(() => {
     if (receivedData.length > 0) {
@@ -32,10 +50,10 @@ function BlindGame() {
   } , [ receivedData ])
 
   const nextmusique = async () => {
-    getSpotifyAction('pause', 'PUT')
-    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
+    getAction('pause', 'PUT')
+    await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
     sleep(200)
-    let queue = (await getSpotifyAction('queue', 'GET')).queue
+    let queue = (await getAction('queue', 'GET')).queue
     let indexMusicinQueue = -1
     console.log('queue', queue, receivedData[musiqueActuelle+1])
     while (queue.length > 0 && indexMusicinQueue === -1) {
@@ -49,35 +67,38 @@ function BlindGame() {
       console.log('indexMusicinQueue', indexMusicinQueue)
       if (indexMusicinQueue === -1) {
         for (let index = 0; index < queue.length; index++) {
-          await getSpotifyAction('next', 'POST')
-          await getSpotifyAction('pause', 'PUT')
+          await getAction('next', 'POST')
+          await getAction('pause', 'PUT')
         }
-        await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
+        await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
         sleep(200)
-        queue = (await getSpotifyAction('queue', 'GET')).queue
+        queue = (await getAction('queue', 'GET')).queue
       }
     }
     if (indexMusicinQueue === -1) {
-      await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
+      await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
 
     }
     for (let index = 0; index < indexMusicinQueue; index++) {
-      getSpotifyAction('next', 'POST')
-      getSpotifyAction('pause', 'PUT')
+      getAction('next', 'POST')
+      getAction('pause', 'PUT')
     }
-    await getSpotifyAction('pause', 'PUT')
+    await getAction('pause', 'PUT')
+    await getAction('next', 'POST')
+    localStorage.setItem('CurrentMusic', (musiqueActuelle + 1).toString())
     setMusiqueActuelle(musiqueActuelle + 1)
-    await getSpotifyAction('next', 'POST')
     setAffichage('Question-Playing')
   }
+    
 
   const Answered = async () => {
-    await getSpotifyAction('pause', 'PUT')
+    await getAction('pause', 'PUT')
   }
   
   React.useEffect(() => {
+    affichageRef.current = affichage
     if (affichage === 'Question-Playing') {
-      getSpotifyAction('play', 'PUT')
+      getAction('play', 'PUT')
     }
     if (affichage === 'Question-Loading') {
       nextmusique()
@@ -85,23 +106,33 @@ function BlindGame() {
     if (affichage === 'Question-Answered') {
       Answered()
     }
+    if (affichage === 'Reponse') {
+      getAction('play', 'PUT')
+    }
   }, [ affichage ])
   
 
   
   React.useEffect(() => {
     const handleKeyDown = (event: any) => {
-      // Utiliser event.code pour des touches spécifiques ou event.key pour des caractères
       if ((event.code === 'Space' || event.key === ' ') && !event.repeat) {
         event.preventDefault()
-        console.log(affichage)
+        if (affichageRef.current === 'Question-Playing') {
+          setAffichage('Question-Answered')
+        } else if (affichageRef.current === 'Question-Answered') {
+          setAffichage('Question-Playing')
+        }
+      } else if ((event.key === 'Enter' || event.code === 'Enter') && !event.repeat) {
+        if (affichageRef.current === 'Question-Answered') {
+          setAffichage('Reponse')
+        } else if (affichageRef.current === 'Reponse') {
+          setAffichage('Question-Loading')
+        }
       }
     }
 
-    // Ajouter l'écouteur d'événements
     window.addEventListener('keydown', handleKeyDown)
 
-    // Nettoyer l'écouteur d'événements
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
@@ -110,14 +141,19 @@ function BlindGame() {
 
   return (
     <div>
-      <h2>BlindGame Musique : {musiqueActuelle}</h2>
-      <div className="content">
-        { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} /> }
-        { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} /> }
-        <button onClick={() => navigate('/ChoosePlaylist')}>Retour à la sélection : </button>
+      {
+        spotifyEteint ? <h2>Spotify est éteint, veuillez le lancer pour jouer, puis recharger la page</h2>: <>
+          <h2>BlindGame Musique : {musiqueActuelle}</h2>
+          <div className="content">
+            { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} /> }
+            { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} /> }
+            <button onClick={() => navigate('/ChoosePlaylist')}>Retour à la sélection : </button>
 
-      </div>
-      { affichage === 'Chargement' && <div>Chargement...</div> }
+          </div>
+          { affichage === 'Chargement' && <div>Chargement...</div> }
+        </>
+      }
+      
     </div>
   )
 }

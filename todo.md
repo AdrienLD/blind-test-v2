@@ -7,19 +7,18 @@
     - [x] Add to save ?????
 
 
-- [ ] Plus beau compte à rebours
+- [x] Plus beau compte à rebours
 - [x] Corriger erreurs lecture Spotify
 - [x] Chercher parmi les +100 premières musiques 
 - [x] Stocker playlist forever (local storage ou cookie) ?
 - [x] playlist crypté
 - [X] Switch mode de jeu => utilisation d'un modal
-- [ ] Erreur Compte spotify éteint
 
-- [ ] Raccourcis clavier
-- [ ] meilleur CSS affichage
+- [x] Raccourcis clavier
+- [x] meilleur CSS affichage
 - [ ] Delete NPLP for the moment
 - [ ] Modal regles partie (temps attente, mode jeu...)
-- [ ] Sauvegarder numero musique actuelle / reutiliser
+- [x] Sauvegarder numero musique actuelle / reutiliser
 - [ ] Sauvegarder Ajouts
 - [ ] Image fenetre Ajouts playlist pour comprendre
 - [ ] Ajout retour bugs
@@ -30,7 +29,7 @@
 - [ ] Bugs : 
     - [ ] Optimiser volume bug file attente
     - [ ] Erreur playlist inexistante
-    - [ ] 
+    - [x] Erreur Compte spotify éteint
 
 - [ ] Mettre en public sur github
 - [ ] Dossier à Spotify

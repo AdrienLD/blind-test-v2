@@ -20,9 +20,6 @@ function CallBack() {
 
   const isTokenFetched = React.useRef(false)
 
-  const [ isSpotifyStart, setIsSpotifyStart ] = React.useState(false)
-  const [ trySpotifyConnection, setTrySpotifyConnection ] = React.useState(true)
-
   function shuffle(array: Musique[]) {
     for (let i = array.length - 1; i > 0; i--) {
       // Sélectionnez un index aléatoire
@@ -82,7 +79,9 @@ function CallBack() {
   const recuperateAllMusic = async (playlistId: string) => {
     let offset = 0
     let musiques: any[] = []
+    await testSpotifyToken()
     let response = await extractMusiquesSpotify(playlistId, offset)
+    console.log('response', response) 
     musiques = musiques.concat(response.items)
     while (response.next) {
       offset += 100
@@ -135,38 +134,24 @@ function CallBack() {
 
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(playlistFinale), secretKey).toString()
     await localStorage.setItem('playlistFinale', ciphertext)
+    await localStorage.setItem('CurrentMusic', '0')
     const mode = localStorage.getItem('mode')
     navigate(mode === 'blind' ? '/BlindGame' : '/PLParoles')
   }
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const status = await testSpotifyToken()
-      console.log('status', status)
-      if (status && !status.error) {
-        setIsSpotifyStart(true)
-      }
-      setTrySpotifyConnection(false)
-    }
-    if (trySpotifyConnection) fetchData()
-  }, [ trySpotifyConnection ])
-
-  React.useEffect(() => {
-    if (!isTokenFetched.current && isSpotifyStart) {
+    if (!isTokenFetched.current) {
       extractmusique()
       isTokenFetched.current = true
     }
-  }, [ isSpotifyStart ])
+  }, [])
 
   return (
     <div className='PlaylistSelection'>
             
       <h2>
         {
-          isSpotifyStart? <div>Recherche en cours...</div>:<div>
-          Veuillez démarrer une musique sur Spotify puis appuyer sur le bouton
-            <button onClick={() => setTrySpotifyConnection(true)}>Extraire les musiques</button>
-          </div>
+          <div>Recherche en cours...</div>
         }
       </h2>
     </div>
