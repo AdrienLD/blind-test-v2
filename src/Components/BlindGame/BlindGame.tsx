@@ -71,27 +71,42 @@ function BlindGame() {
     setAffichage('Question-Playing')
   }
 
+  const Answered = async () => {
+    await getSpotifyAction('pause', 'PUT')
+  }
   
   React.useEffect(() => {
-    const playMusic = async () => {
-      await getSpotifyAction('play', 'PUT')
-      
-      
-    }
-    const LoadMusic = async () => {
-      nextmusique()
-    }
     if (affichage === 'Question-Playing') {
-      playMusic()
+      getSpotifyAction('play', 'PUT')
     }
     if (affichage === 'Question-Loading') {
-      LoadMusic()
+      nextmusique()
+    }
+    if (affichage === 'Question-Answered') {
+      Answered()
     }
   }, [ affichage ])
   
 
   
-  
+  React.useEffect(() => {
+    const handleKeyDown = (event: any) => {
+      // Utiliser event.code pour des touches spécifiques ou event.key pour des caractères
+      if ((event.code === 'Space' || event.key === ' ') && !event.repeat) {
+        event.preventDefault()
+        console.log(affichage)
+      }
+    }
+
+    // Ajouter l'écouteur d'événements
+    window.addEventListener('keydown', handleKeyDown)
+
+    // Nettoyer l'écouteur d'événements
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
 
   return (
     <div>

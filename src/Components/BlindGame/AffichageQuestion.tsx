@@ -1,7 +1,7 @@
 import React from 'react'
 import Countdown from '../VisuelQuestion/Countdown/Countdown' // Mettre à jour le chemin d'accès selon la structure de votre projet
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
-import { pause, play } from './SpotifyAPI'
+import { play } from './SpotifyAPI'
 
 interface AffichageQuestionProps {
   musique: Musique
@@ -54,8 +54,7 @@ function AffichageQuestion ({ musique, affichage, setAffichage }: AffichageQuest
 
 function VideoCountdown({ setAffichage }: { setAffichage: setAffichageProps}) {
   const endTimer = async () => {
-    await pause()
-    setAffichage('Question-Answered')
+    setAffichage('Question-Loading')
   }
   return (
     <div>

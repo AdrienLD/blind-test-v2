@@ -179,7 +179,7 @@ const PlaylistSelection: React.FC = () => {
     if (genre === 'UserPlaylist') {
       return userPlaylistInfos.find(playlist => playlist[0] === playlistName)?.[1]
     }
-    return `/images/${genre} - ${playlistName}.jpg`
+    return `/images/playlists/${genre} - ${playlistName}.jpg`
   }
 
   const cutString = (searchString: string) => {
