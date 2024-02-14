@@ -33,7 +33,6 @@ const API_URL = 'http://localhost:4000/api'
 
 
 const verifyToken = async (data, action) => {
-  console.log('data', data)
   if (data.status === 401 || !data || data.error?.status === 401) {
     console.error('Spotify déconnecté')
     await getSpotifyToken()
@@ -87,7 +86,6 @@ export async function extractMusiquesSpotify(playlistId, offset) {
     const data = await response.json()
     const erreur = await verifyToken(data, () => extractMusiquesSpotify(playlistId, offset))
     if (erreur) return erreur
-    console.log('data2', data)
     return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
@@ -126,7 +124,8 @@ export async function getSpotifyAction(commande, method) {
       console.log(data)
       return data
     } else {
-      console.log('Réponse réussie sans corps de contenu.')
+      console.log('Erreur lors de l\'échange du code:', commande, method, response)
+      return 
       
     }
   } catch (error) {

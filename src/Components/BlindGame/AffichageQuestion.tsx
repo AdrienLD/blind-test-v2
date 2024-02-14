@@ -8,13 +8,14 @@ interface AffichageQuestionProps {
   musique: Musique
   affichage: string
   setAffichage: setAffichageProps
+  temps: number
 }
 
 export interface setAffichageProps {
   (value: string): void
 }
 
-function AffichageQuestion ({ musique, affichage, setAffichage }: AffichageQuestionProps) {
+function AffichageQuestion ({ musique, affichage, setAffichage, temps }: AffichageQuestionProps) {
 
   
   const moreTime = async () => {
@@ -43,7 +44,7 @@ function AffichageQuestion ({ musique, affichage, setAffichage }: AffichageQuest
       <div className="infos">
         <p className='TitrePlaylist'>Playlist : {musique.playlist.split(' £ ')[1]}</p>
         {affichage === 'Question-Loading' && <Chargement />}
-        {affichage === 'Question-Playing' && <Countdown duration={10000} onFinish={() => setAffichage('Question-Answered')}/>}
+        {affichage === 'Question-Playing' && <Countdown duration={temps*1000} onFinish={() => setAffichage('Question-Answered')}/>}
         {affichage === 'Question-Answered' && <div className='Question-Answered'>
           <button onClick={moreTime}>+ de temps</button>
           <button onClick={response}>Réponse</button>

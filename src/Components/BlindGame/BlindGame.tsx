@@ -7,6 +7,8 @@ import { decryptPlaylist } from './SpotifyAPI'
 import AffichageReponse from './AffichageReponse'
 import AffichageQuestion from './AffichageQuestion'
 import { sleep } from './utils'
+import DialogRules, { RulesParams } from './DialogRules/DialogRules'
+
 
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
@@ -15,6 +17,9 @@ function BlindGame() {
   const navigate = useNavigate()
   const [ receivedData, setReceivedData ] = React.useState<Musique[]>([])
   const [ spotifyEteint, setSpotifyEteint ] = React.useState(false)
+  const [ openRules, setOpenRules ] = React.useState(false)
+  const [ mode, setMode ] = React.useState('Continu')
+  const [ temps, setTemps ] = React.useState(10)
 
   React.useEffect(() => {
     const ciphertext = localStorage.getItem('playlistFinale')
@@ -55,8 +60,17 @@ function BlindGame() {
     sleep(200)
     let queue = (await getAction('queue', 'GET')).queue
     let indexMusicinQueue = -1
-    console.log('queue', queue, receivedData[musiqueActuelle+1])
-    while (queue.length > 0 && indexMusicinQueue === -1) {
+    for (let index = 0; index < queue.length; index++) {
+      const element = queue[index]
+      if (element.id === receivedData[musiqueActuelle+1].id) {
+        indexMusicinQueue = index
+        break
+      }
+    }
+    if (indexMusicinQueue === -1) {
+      await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
+      sleep(200)
+      queue = (await getAction('queue', 'GET')).queue
       for (let index = 0; index < queue.length; index++) {
         const element = queue[index]
         if (element.id === receivedData[musiqueActuelle+1].id) {
@@ -64,25 +78,24 @@ function BlindGame() {
           break
         }
       }
-      console.log('indexMusicinQueue', indexMusicinQueue)
       if (indexMusicinQueue === -1) {
-        for (let index = 0; index < queue.length; index++) {
-          await getAction('next', 'POST')
-          await getAction('pause', 'PUT')
-        }
-        await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
-        sleep(200)
-        queue = (await getAction('queue', 'GET')).queue
+        console.error('Error while adding music to queue', receivedData[musiqueActuelle+1])
+        localStorage.setItem('CurrentMusic', (musiqueActuelle + 1).toString())
+        setMusiqueActuelle(musiqueActuelle + 1)
+        await sleep(200)
+        nextmusique()
       }
-    }
-    if (indexMusicinQueue === -1) {
       await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
-
+      sleep(200)
+      queue = (await getAction('queue', 'GET')).queue
     }
+    const volume = (await getAction('', 'GET')).device.volume_percent
+    await getAction('volume?volume_percent=0', 'PUT')
     for (let index = 0; index < indexMusicinQueue; index++) {
       getAction('next', 'POST')
       getAction('pause', 'PUT')
     }
+    await getAction(`volume?volume_percent=${volume}`, 'PUT') 
     await getAction('pause', 'PUT')
     await getAction('next', 'POST')
     localStorage.setItem('CurrentMusic', (musiqueActuelle + 1).toString())
@@ -92,7 +105,11 @@ function BlindGame() {
     
 
   const Answered = async () => {
-    await getAction('pause', 'PUT')
+    if (mode === 'Continu') {
+      setAffichage('Reponse')
+      await sleep(5000)
+      setAffichage('Question-Loading')
+    } else await getAction('pause', 'PUT')
   }
   
   React.useEffect(() => {
@@ -138,22 +155,32 @@ function BlindGame() {
     }
   }, [])
 
+  const Rules = ({ mode, temps }: RulesParams) => {
+    console.log('Mode sélectionné:', mode, 'Temps d\'écoute:', temps)
+    setOpenRules(false)
+    setMode(mode)
+    setTemps(temps)
+  }
+
 
   return (
     <div>
       {
         spotifyEteint ? <h2>Spotify est éteint, veuillez le lancer pour jouer, puis recharger la page</h2>: <>
           <h2>BlindGame Musique : {musiqueActuelle}</h2>
+          <div className="header">
+            <button onClick={() => navigate('/ChoosePlaylist')}>Retour sélection</button>
+            <button onClick={() => setOpenRules(true)}>Règles</button>
+          </div>
           <div className="content">
-            { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} /> }
+            { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} temps={temps} /> }
             { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} /> }
-            <button onClick={() => navigate('/ChoosePlaylist')}>Retour à la sélection : </button>
 
           </div>
           { affichage === 'Chargement' && <div>Chargement...</div> }
         </>
       }
-      
+      <DialogRules open={openRules} onClose={() => setOpenRules(false)} modifyRules={Rules} modeInitial={mode} tempsInitial={temps} />
     </div>
   )
 }

@@ -41,7 +41,7 @@ function Countdown({ duration, onFinish }: CountdownProps){
           <circle
             cx={radius + strokeWidth / 2}
             cy={radius + strokeWidth / 2}
-            r={radius - strokeWidth / 2}
+            r={radius }
             fill="none"
             stroke="black"
             strokeWidth={strokeWidth}

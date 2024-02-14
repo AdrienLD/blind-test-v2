@@ -17,13 +17,15 @@
 - [x] Raccourcis clavier
 - [x] meilleur CSS affichage
 - [ ] Delete NPLP for the moment
-- [ ] Modal regles partie (temps attente, mode jeu...)
+- [x] Modal regles partie (temps attente, mode jeu...)
 - [x] Sauvegarder numero musique actuelle / reutiliser
 - [ ] Sauvegarder Ajouts
 - [ ] Image fenetre Ajouts playlist pour comprendre
 - [ ] Ajout retour bugs
 - [ ] Première fenetre pas Mes Playlists
 - [ ] List linked playlists Ids
+- [ ] Boutons skip
+- [ ] Regle start pas au début
 
 
 - [ ] Bugs : 
