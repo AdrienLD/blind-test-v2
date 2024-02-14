@@ -1,40 +1,53 @@
 import React, { useState, useEffect } from 'react'
 import './Countdown.sass'
 
-function Countdown() {
-  const [ timeLeft, setTimeLeft ] = useState(1000)
-  const [ millisecondsLeft, setMillisecondsLeft ] = useState(1000)
-  const circumference = 2 * Math.PI * 70 
-  const strokeDashoffset = (millisecondsLeft / 1000) * circumference
+interface CountdownProps {
+  duration: number
+  onFinish: () => void
+}
+
+function Countdown({ duration, onFinish }: CountdownProps){
+  const [ timeLeft, setTimeLeft ] = useState(duration)
+  const radius = 150
+  const circumference = 2 * Math.PI * radius
 
   useEffect(() => {
-    if (millisecondsLeft > 0) {
-      const timer = setTimeout(() => {
-        setMillisecondsLeft(millisecondsLeft - 10)
-      }, 10)
-      return () => clearTimeout(timer)
-    } else if (timeLeft > 0) {
-      setTimeLeft(timeLeft - 1)
-      setMillisecondsLeft(1000)
-    }
-  }, [ millisecondsLeft, timeLeft ])
+    const interval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        const newTime = prevTime - 15
+        if (newTime <= 0) {
+          clearInterval(interval)
+          onFinish()
+          return 0
+        } 
+        return newTime
+
+      })
+    }, 10)
+    return () => clearInterval(interval)
+  }, [  ])
+  
+  const strokeDashoffset = ((timeLeft / duration) * circumference)
+
+  const strokeWidth = 10
+
+  const viewBoxSize = radius * 2 + strokeWidth
 
   return (
     <div className="countdown">
       <div className="circle-container">
-        <h1 className='timeLeft'>{timeLeft}</h1>
-        <svg width="168" height="168" viewBox="0 0 168 168">
+        <h1 className='timeLeft'>{(timeLeft / 1000).toFixed(2)}</h1>
+        <svg width={viewBoxSize} height={viewBoxSize} viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}>
           <circle
-            cx="84"
-            cy="84"
-            r="70"
+            cx={radius + strokeWidth / 2}
+            cy={radius + strokeWidth / 2}
+            r={radius - strokeWidth / 2}
             fill="none"
-            stroke="purple"
-            strokeWidth="10"
-            
+            stroke="black"
+            strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            transform="rotate(-90, 84, 84)"
+            transform={`rotate(-90 ${radius + strokeWidth / 2} ${radius + strokeWidth / 2})`}
           />
         </svg>
       </div>

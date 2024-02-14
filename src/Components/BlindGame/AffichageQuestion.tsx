@@ -1,7 +1,8 @@
 import React from 'react'
-import Countdown from '../VisuelQuestion/Countdown/Countdown' // Mettre à jour le chemin d'accès selon la structure de votre projet
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import { play } from './SpotifyAPI'
+import Chargement from '../Chargement/Chargement'
+import Countdown from '../VisuelQuestion/Countdown/Countdown'
 
 interface AffichageQuestionProps {
   musique: Musique
@@ -40,28 +41,14 @@ function AffichageQuestion ({ musique, affichage, setAffichage }: AffichageQuest
     <div className='VisuelQuestion'>
       <img src={musique.playlistimg} alt='pochette playlist' className='PochetteAlbum' />
       <div className="infos">
-        <p className='TitrePlaylist'>Playlist : {musique.playlist}</p>
-        {affichage === 'Question-Loading' && <Countdown />}
-        {affichage === 'Question-Playing' && <VideoCountdown setAffichage={setAffichage}/>}
-        {affichage === 'Question-Answered' && <div>
+        <p className='TitrePlaylist'>Playlist : {musique.playlist.split(' £ ')[1]}</p>
+        {affichage === 'Question-Loading' && <Chargement />}
+        {affichage === 'Question-Playing' && <Countdown duration={10000} onFinish={() => setAffichage('Question-Answered')}/>}
+        {affichage === 'Question-Answered' && <div className='Question-Answered'>
           <button onClick={moreTime}>+ de temps</button>
           <button onClick={response}>Réponse</button>
         </div> }
       </div>
-    </div>
-  )
-}
-
-function VideoCountdown({ setAffichage }: { setAffichage: setAffichageProps}) {
-  const endTimer = async () => {
-    setAffichage('Question-Loading')
-  }
-  return (
-    <div>
-      <video width="320" height="240" controls autoPlay muted onEnded={endTimer}>
-        <source src={`${process.env.PUBLIC_URL}/countdown10.mp4`} type="video/mp4" />
-                                          Votre navigateur ne prend pas en charge la balise vidéo.
-      </video>
     </div>
   )
 }

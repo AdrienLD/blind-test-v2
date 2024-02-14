@@ -31,9 +31,30 @@ const fetchOptions = (method, body = null) => ({
 
 const API_URL = 'http://localhost:4000/api'
 
+
+const verifyToken = async (data, action) => {
+  console.log('data', data)
+  if (data.status === 401 || !data || data.error?.status === 401) {
+    console.error('Spotify déconnecté')
+    await getSpotifyToken()
+    const test = await testSpotifyToken()
+    if (test.error?.status === 401 || !test) {
+      console.error('Spotify éteint')
+      return test
+    } else {
+      action()
+    }
+  } else if (data.status === 404|| data.error?.status === 404) {
+    console.error('Spotify déconnecté')
+    return data
+  }
+}
+
 async function SpotifyToken(action){
   try {
     const response = await fetch(`${API_URL}/gettoken`, fetchOptions('POST', { action, code: window.location.search.split('=')[1] }))
+    const erreur = await verifyToken(response, () => SpotifyToken(action))
+    if (erreur) return erreur
     const data = await response.json()
     return data
   } catch (error) {
@@ -48,11 +69,10 @@ export async function getSpotifyToken() {
 }
 
 export async function researchSpotify(recherche, type) {
-  console.log('research')
-  await testSpotifyToken()
-  console.log('test')
   try {
     const response = await fetch(`${API_URL}/research`, fetchOptions('POST', { titre: recherche, type }))
+    const erreur = await verifyToken(response, () => researchSpotify(recherche, type))
+    if (erreur) return erreur
     const data = await response.json()
     return data
   } catch (error) {
@@ -62,11 +82,12 @@ export async function researchSpotify(recherche, type) {
 }
 
 export async function extractMusiquesSpotify(playlistId, offset) {
-  await testSpotifyToken()
   try {
     const response = await fetch(`${API_URL}/tracks`, fetchOptions('POST', { playlistId, offset }))
     const data = await response.json()
-    console.log('tracks', data)
+    const erreur = await verifyToken(data, () => extractMusiquesSpotify(playlistId, offset))
+    if (erreur) return erreur
+    console.log('data2', data)
     return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
@@ -75,11 +96,9 @@ export async function extractMusiquesSpotify(playlistId, offset) {
 }
 
 export async function testSpotifyToken() {
-  console.log('test')
   try {
     const response = await fetch(`${API_URL}/testtoken`, fetchOptions('GET'))
     const data = await response.json()
-    console.log('test')
     if (data.error?.status === 401 || !data) await getSpotifyToken()
     else return data
   } catch (error) {
@@ -88,8 +107,8 @@ export async function testSpotifyToken() {
   }
 }
 
+
 export async function getSpotifyAction(commande, method) {
-  await testSpotifyToken()
   try {
     const response = await fetch(`${API_URL}/playpause`, {
       method: 'GET',
@@ -100,6 +119,8 @@ export async function getSpotifyAction(commande, method) {
       },
       credentials: 'include'
     })
+    const erreur = await verifyToken(response, () => getSpotifyAction(commande, method))
+    if (erreur) return erreur
     if (response.ok && response.status !== 204) {
       const data = await response.json()
       console.log(data)
@@ -115,13 +136,11 @@ export async function getSpotifyAction(commande, method) {
 }
 
 export async function searchNewSpotifyPlaylist(playlistId) {
-  await testSpotifyToken()
   try {
-    console.log('Search')
-    const retour = await fetch(`${API_URL}/newplaylist`, fetchOptions('POST', { playlistId }))
-    console.log('finish search')
-    const data = await retour.json()
-    console.log('data', data)
+    const response = await fetch(`${API_URL}/newplaylist`, fetchOptions('POST', { playlistId }))
+    const erreur = await verifyToken(response, () => getSpotifyAction(commande, method))
+    if (erreur) return erreur
+    const data = await response.json()
     return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)

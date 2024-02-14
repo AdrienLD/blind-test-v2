@@ -15,7 +15,7 @@ function AffichageReponse ({ musique, setAffichage }: AffichageReponseProps){
         <p className='TitrePlaylist'>{musique.titre}</p>
         <p className='TitrePlaylist'>{musique.artiste}</p>
         <p className='TitrePlaylist'>{musique.album}</p>
-        <div>
+        <div className='Response'>
           <button onClick={() =>setAffichage('Question-Loading')}>Musique suivante</button>
         </div>
       </div>
