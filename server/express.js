@@ -77,7 +77,7 @@ app.post('/api/research', async (req, res) => {
     
 
   try {
-    const token = req.cookies.token
+    const token = 'BQA_IbGqbpC05I046E4JV95JXThNaYKissrv4vAX7IzOAofT24s0un9UbpZo2vlnGKgR2bhdEDWAq2VwwaVPnlvIsipWy6CnHjbcyyEVJwYKCbxptmHqwU8qWpQvI3Bb7A_gF6b1c5fCOYRRgXdCdMMp97EucuWNoyNRGAfC1fDK16GZgnJl2sl4ZCkebmN9lDAs_7jcq3LDb_9ymC1512JczQ'
     console.log('research')
     const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
       method: 'GET',
@@ -181,7 +181,7 @@ app.get('/api/getlyricsId', async (req, res) => {
 app.post('/api/newplaylist', async (req, res) => {
   const { playlistId } = req.body
   try {
-    const token = 'BQAauG8MdEGh9Edkb_QJH8n4ubBUhjuz4O1GSDz2npgIfYoPUrLnxK4zoKon1_G6GPJ9Hv8X_gLcYsPZTJBu7GKiXqNER5gIYkQsNHDTyj8mlhIiry1Gub_sWdjHhaaorAlrewbLX7R5Y8-DYPNYD_tcQbLif7R7XXVQmeWyl3MQ7a7tTY-2CnZ1MpP6na72G_uEMH67cVmgIOG-bQyflYJ4PTOV'
+    const token = 'BQA_IbGqbpC05I046E4JV95JXThNaYKissrv4vAX7IzOAofT24s0un9UbpZo2vlnGKgR2bhdEDWAq2VwwaVPnlvIsipWy6CnHjbcyyEVJwYKCbxptmHqwU8qWpQvI3Bb7A_gF6b1c5fCOYRRgXdCdMMp97EucuWNoyNRGAfC1fDK16GZgnJl2sl4ZCkebmN9lDAs_7jcq3LDb_9ymC1512JczQ'
     console.log('newPlaylist')
     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
       method: 'GET',

@@ -1,5 +1,5 @@
 import playlisttest from './playlistImages.js'
-import { searchNewSpotifyPlaylist } from './AppelsSpotify.js'
+import { researchSpotify, searchNewSpotifyPlaylist } from './AppelsSpotify.js'
 
 import fs from 'fs'
 import https from 'https'
@@ -13,9 +13,8 @@ const basePath = '../../public/images/playlists/'
 
 const requireplaylist = async (titre, genre, id) => {
   const data = await searchNewSpotifyPlaylist(id)
-  console.log(data.name)
+  console.log(id, (await researchSpotify(id, 'playlist')).playlists.items, id)
   const savePath = path.join(__dirname, `${basePath}${genre} - ${titre}.jpg`)
-  console.log(savePath)
   await downloadImage(data.images[0].url, savePath)
   return data
 }
@@ -24,7 +23,6 @@ function downloadImage(url, filename) {
   const file = fs.createWriteStream(filename)
   const request = https.get(url, (response) => {
     response.pipe(file)
-    console.log('Downloading image...', request)
     file.on('finish', () => {
       file.close()
       console.log('Download completed.')
