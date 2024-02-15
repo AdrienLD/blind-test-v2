@@ -22,7 +22,6 @@
     "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
     "sass": "^1.70.0",
-    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -33,6 +32,7 @@
     "start-server": "node server/express.js",
     "start-both": "concurrently \"npm start\" \"npm run start-server\"",
     "update-images": "node src/Components/updateImages.js"
+
   },
   "eslintConfig": {
     "extends": [
@@ -59,7 +59,9 @@
     "concurrently": "^8.2.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.1",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "type": "module"
 }

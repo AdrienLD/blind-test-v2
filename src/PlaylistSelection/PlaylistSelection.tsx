@@ -3,13 +3,14 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { getSpotifyToken, playlist, secretKey } from '../Components/Playlist'
+import { PlaylistItem, playlist2 } from '../Components/playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
 import DialogGameChoice from '../Components/Dialog/DialogGameChoice/DialogGameChoice'
 import DialogNewPlaylist from '../Components/Dialog/DialogNewPlaylist/DialogNewPlaylist'
 import { useNavigate } from 'react-router-dom'
+import { getSpotifyToken, secretKey } from '../Components/AppelsSpotify'
 
 
 
@@ -28,10 +29,10 @@ const PlaylistSelection: React.FC = () => {
   const [ open, setOpen ] = React.useState(false)
   const [ openNewPlaylist, setOpenNewPlaylist ] = React.useState(false)
   const [ showAlert, setShowAlert ] = React.useState(false)
-  const [ userPlaylist, setUserPlaylist ] = React.useState<[string, string[]]>([ 'UserPlaylist', [ 'Ajouter' ] ])
+  const [ userPlaylist, setUserPlaylist ] = React.useState<PlaylistItem[]>([ { name: 'Ajouter', id:'' } ] )
   const [ userPlaylistInfos, setUserPlaylistInfos ] = React.useState<string[][]>(localStorage.getItem('userPlaylistInfos') ? JSON.parse(localStorage.getItem('userPlaylistInfos') as string) : [ [ 'Ajouter', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/1200px-PlusCM128.svg.png', '' ] ])
-  const playlistSelections = playlist
-  const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState<[string, string[]]>(playlistSelections[0])
+  const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState(playlist2[0]['Années'])
+  const [ CategorieAfficher, setCategorieAfficher ] = React.useState('Années')
 
   const [ PlaylistsSelectionnees, setPlaylistsSelectionnees ] = React.useState<string[]>(() => {
     const playlistsJson = localStorage.getItem('playlists')
@@ -42,7 +43,9 @@ const PlaylistSelection: React.FC = () => {
 
   const isTokenFetched = React.useRef(false)
   React.useEffect(() => {
-    setPlaylistsAfficher(userPlaylist)
+    if (CategorieAfficher === 'UserPlaylist') {
+      setPlaylistsAfficher(userPlaylist)
+    }
   }, [ userPlaylist ])
 
   React.useEffect(() => {
@@ -58,9 +61,12 @@ const PlaylistSelection: React.FC = () => {
   }, [ PlaylistsSelectionnees ])
 
   React.useEffect(() => {
-    const nomsPlaylists = userPlaylistInfos.map(playlist => playlist[0])
-    setUserPlaylist([ 'UserPlaylist', nomsPlaylists ])
-    setPlaylistsAfficher(playlistSelections[0])
+    const newUserPlaylistStructure = userPlaylistInfos.map(playlist => ({
+      name: playlist[0],
+      id: playlist[2] || ''
+    }))
+    
+    setUserPlaylist(newUserPlaylistStructure)
   }, [])
 
   React.useEffect(() => {
@@ -77,22 +83,29 @@ const PlaylistSelection: React.FC = () => {
     localStorage.setItem('userPlaylistInfos', JSON.stringify(userPlaylistInfos))
   }, [ userPlaylistInfos ])
 
-  const ListPlaylists: ListPlaylistCardProps[] = playlistSelections.map((selection): ListPlaylistCardProps => ({
-    nom: selection[0],
-    onHover: () => { setPlaylistsAfficher(selection) }
-  }))
+  const ListPlaylists: ListPlaylistCardProps[] = []
+
+  playlist2.forEach(categoryObject => {
+    Object.keys(categoryObject).forEach(category => {
+      console.log(categoryObject[category], category)
+      ListPlaylists.push({
+        nom: category,
+        onHover: () => { {setPlaylistsAfficher(categoryObject[category])
+          setCategorieAfficher(category)} }
+      })
+    })
+  })
 
 
-  const addNewPlaylist = (listplaylist: string, playlist: string) => {
-    const playlists = `${listplaylist} £ ${playlist}`
-    if (playlists === 'UserPlaylist £ Ajouter') {
+  const addNewPlaylist = (name: string, playlistId: string) => {
+    if (name === 'Ajouter') {
       setOpenNewPlaylist(true)
     } else
-      if (!PlaylistsSelectionnees.includes(playlists)) {
-        setPlaylistsSelectionnees(PlaylistsSelectionnees.concat(playlists))
+      if (!PlaylistsSelectionnees.includes(playlistId)) {
+        setPlaylistsSelectionnees(PlaylistsSelectionnees.concat(playlistId))
         setShowAlert(false)
       } else {
-        setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlists))
+        setPlaylistsSelectionnees(PlaylistsSelectionnees.filter((playlist) => playlist !== playlistId))
       }
   }
 
@@ -121,11 +134,11 @@ const PlaylistSelection: React.FC = () => {
   const  addNewUserPlaylist = async (playlist: any) => {
     
     setOpenNewPlaylist(false)
-    await setUserPlaylist(userPlaylist => {
-      const updatedFirstElement = userPlaylist[0]
-      const updatedSecondElement = [ ...userPlaylist[1], playlist.name ]
-      return [ updatedFirstElement, updatedSecondElement ]
-    })
+    const updatedPlaylists = [
+      ...userPlaylist,
+      { name: playlist.name, id: playlist.id || '' }
+    ]
+    setUserPlaylist(updatedPlaylists as PlaylistItem[])
     setUserPlaylistInfos(userPlaylistInfos.concat([ [ playlist.name, playlist.images[0].url, playlist.id ] ]) )
   }
 
@@ -207,20 +220,29 @@ const PlaylistSelection: React.FC = () => {
               <ListPlaylistCard {...playlist} />
             ))
           }
-          <button className="ListPlaylistCard UserPlaylist" onClick={() => setPlaylistsAfficher(userPlaylist)}>Mes playlists</button>
+          <button className="ListPlaylistCard UserPlaylist" onClick={() =>{ setPlaylistsAfficher(userPlaylist) 
+            setCategorieAfficher('UserPlaylist')}}>Mes playlists</button>
 
         </div>
         <div className="PlaylistsPossibles">
-          {
-            PlaylistsAfficher[1].map((playlist) => (
+          <>
+            {
+              console.log('PlaylistsAfficher', PlaylistsAfficher)
+            }
+            {
+              PlaylistsAfficher
+            && PlaylistsAfficher.map(({ name, id }) => (
               <PlaylistCard 
-                genre={PlaylistsAfficher[0]}
-                nom={playlist} 
-                choisie={PlaylistsSelectionnees.includes(`${PlaylistsAfficher[0]} £ ${playlist}`)}
-                onClick={() => { addNewPlaylist(PlaylistsAfficher[0], playlist) }} />
+                nom={name} 
+                id={id}
+                genre={CategorieAfficher}
+                choisie={PlaylistsSelectionnees.includes(`${name}`)}
+                onClick={() => { addNewPlaylist(name, id) }}
+              />
             ))
-          }
-                    
+            
+            }
+          </>    
         </div>
         <div className="panneaudroite">
           

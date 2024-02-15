@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../PlaylistSelection/PlaylistSelection'
-import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from './Playlist'
+import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from './AppelsSpotify'
 import CryptoJS from 'crypto-js'
 
 interface Image {

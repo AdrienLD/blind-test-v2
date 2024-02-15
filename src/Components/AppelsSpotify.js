@@ -12,9 +12,7 @@ export const playlist = [
   [ 'Langues' , [ 'Chanson française', 'Rock Français', 'Rap Français' ] ]
 ]
 
-export const playlistUtilisateur = [
-  []
-]
+
 
 export const secretKey = 'meilleur'
 

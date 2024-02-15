@@ -1,4 +1,6 @@
-import { playlist, researchSpotify } from './Playlist.js'
+import playlisttest from './playlistImages.js'
+import { searchNewSpotifyPlaylist } from './AppelsSpotify.js'
+
 import fs from 'fs'
 import https from 'https'
 import path from 'path'
@@ -9,10 +11,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const basePath = '../../public/images/playlists/'
 
-const requireplalist = async (titre, genre) => {
-  const data = await researchSpotify(`${genre} ${titre}`, 'playlist')
+const requireplaylist = async (titre, genre, id) => {
+  const data = await searchNewSpotifyPlaylist(id)
+  console.log(data.name)
   const savePath = path.join(__dirname, `${basePath}${genre} - ${titre}.jpg`)
-  if (data.playlists && data.playlists.items) await downloadImage(data.playlists?.items[0]?.images[0].url, savePath)
+  console.log(savePath)
+  await downloadImage(data.images[0].url, savePath)
   return data
 }
 
@@ -20,7 +24,7 @@ function downloadImage(url, filename) {
   const file = fs.createWriteStream(filename)
   const request = https.get(url, (response) => {
     response.pipe(file)
-    
+    console.log('Downloading image...', request)
     file.on('finish', () => {
       file.close()
       console.log('Download completed.')
@@ -35,13 +39,12 @@ function downloadImage(url, filename) {
   })
 }
 
-function main(){
-  // gettoken()
-  for (const genre in playlist) {
-    for (const titre of playlist[genre][1]) {
-      requireplalist(titre, playlist[genre][0])
-    }
-  }
+export function main(){
+  Object.entries(playlisttest).forEach(([ genre, titres ]) => {
+    titres.forEach(titre => {
+      requireplaylist(titre.name, genre, titre.id) // Assurez-vous que requireplaylist est défini correctement
+    })
+  })
 }
 
 main()

@@ -181,7 +181,7 @@ app.get('/api/getlyricsId', async (req, res) => {
 app.post('/api/newplaylist', async (req, res) => {
   const { playlistId } = req.body
   try {
-    const token = req.cookies.token
+    const token = 'BQAauG8MdEGh9Edkb_QJH8n4ubBUhjuz4O1GSDz2npgIfYoPUrLnxK4zoKon1_G6GPJ9Hv8X_gLcYsPZTJBu7GKiXqNER5gIYkQsNHDTyj8mlhIiry1Gub_sWdjHhaaorAlrewbLX7R5Y8-DYPNYD_tcQbLif7R7XXVQmeWyl3MQ7a7tTY-2CnZ1MpP6na72G_uEMH67cVmgIOG-bQyflYJ4PTOV'
     console.log('newPlaylist')
     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
       method: 'GET',
