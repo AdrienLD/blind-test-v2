@@ -119,7 +119,7 @@ const PlaylistSelection: React.FC = () => {
   }
 
   const  addNewUserPlaylist = async (playlist: any) => {
-    
+    console.log('playlist', playlist, playlist.name)
     setOpenNewPlaylist(false)
     await setUserPlaylist(userPlaylist => {
       const updatedFirstElement = userPlaylist[0]
@@ -193,6 +193,24 @@ const PlaylistSelection: React.FC = () => {
     return string.slice(0, lastIndexOf) + '...'
   }
 
+  const handleDeletePlaylist = (playlistName: string) => {
+    console.log('playlistName', playlistName, userPlaylist)
+    const index = userPlaylist[1].findIndex(playlist => playlist === playlistName)
+    if (index !== -1) {
+      const newPlaylists = [ ...userPlaylist[1] ]
+      newPlaylists.splice(index, 1)
+      setUserPlaylist([ userPlaylist[0], newPlaylists ])
+      if (PlaylistsSelectionnees.includes(`UserPlaylist £ ${playlistName}`)) {
+        setPlaylistsSelectionnees(PlaylistsSelectionnees.filter(playlist => playlist !== `UserPlaylist £ ${playlistName}`))
+      }
+    }
+    const indexInfos = userPlaylistInfos.findIndex(playlist => playlist[0] === playlistName)
+    if (indexInfos !== -1) {
+      const newPlaylistsInfos = [ ...userPlaylistInfos ]
+      newPlaylistsInfos.splice(indexInfos, 1)
+      setUserPlaylistInfos(newPlaylistsInfos)
+    }
+  }
 
   return (
     <div className='PlaylistSelection'>
@@ -217,7 +235,8 @@ const PlaylistSelection: React.FC = () => {
                 genre={PlaylistsAfficher[0]}
                 nom={playlist} 
                 choisie={PlaylistsSelectionnees.includes(`${PlaylistsAfficher[0]} £ ${playlist}`)}
-                onClick={() => { addNewPlaylist(PlaylistsAfficher[0], playlist) }} />
+                onClick={() => { addNewPlaylist(PlaylistsAfficher[0], playlist) }} 
+                onDeletePlaylist={handleDeletePlaylist}/>
             ))
           }
                     

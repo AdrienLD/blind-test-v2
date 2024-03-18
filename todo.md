@@ -16,18 +16,19 @@
 
 - [x] Raccourcis clavier
 - [x] meilleur CSS affichage
-- [ ] Delete NPLP for the moment
-- [ ] Modal regles partie (temps attente, mode jeu...)
+- [x] Modal regles partie (temps attente, mode jeu...)
 - [x] Sauvegarder numero musique actuelle / reutiliser
-- [ ] Sauvegarder Ajouts
-- [ ] Image fenetre Ajouts playlist pour comprendre
+- [x] Sauvegarder Ajouts
+- [x] Image fenetre Ajouts playlist pour comprendre
 - [ ] Ajout retour bugs
 - [ ] Première fenetre pas Mes Playlists
-- [ ] List linked playlists Ids
-
+- [ ] Boutton passer musique et Réponse
+- [ ] Rajouter NPLP
+- [x] Supprimer playlist perso ajoutée
+- [ ] Formatter meilleure recherche playlist
 
 - [ ] Bugs : 
-    - [ ] Optimiser volume bug file attente
+    - [x] Optimiser volume bug file attente
     - [ ] Erreur playlist inexistante
     - [x] Erreur Compte spotify éteint
 
