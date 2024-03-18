@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogContentText } from '@mui/material'
 import './DialogNewPlaylist.sass'
-import { searchNewSpotifyPlaylist } from '../../Playlist'
+import { searchNewSpotifyPlaylist } from '../../../Common/Playlist'
 
 interface DialogNewPlaylistProps {
   open: boolean

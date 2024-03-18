@@ -1,4 +1,4 @@
-import { playlist, researchSpotify } from './Playlist.js'
+import { playlist, researchSpotify } from '../Common/Playlist.js'
 import fs from 'fs'
 import https from 'https'
 import path from 'path'
@@ -10,9 +10,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const basePath = '../../public/images/playlists/'
 
 const requireplalist = async (titre, genre) => {
-  const data = await researchSpotify(`${genre} ${titre}`, 'playlist')
+  const data = await researchSpotify([ genre, titre ], 'playlist')
   const savePath = path.join(__dirname, `${basePath}${genre} - ${titre}.jpg`)
-  if (data.playlists && data.playlists.items) await downloadImage(data.playlists?.items[0]?.images[0].url, savePath)
+  console.log('data', data)
+  await downloadImage(data.images[0].url, savePath)
   return data
 }
 

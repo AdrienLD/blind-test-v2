@@ -1,8 +1,8 @@
 import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import { play } from './SpotifyAPI'
-import Chargement from '../Chargement/Chargement'
-import Countdown from '../VisuelQuestion/Countdown/Countdown'
+import Chargement from '../../Common/Chargement/Chargement'
+import Countdown from '../../Common/Countdown/Countdown'
 
 interface AffichageQuestionProps {
   musique: Musique

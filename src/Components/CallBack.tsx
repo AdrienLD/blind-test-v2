@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../PlaylistSelection/PlaylistSelection'
-import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from './Playlist'
+import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from '../Common/Playlist'
 import CryptoJS from 'crypto-js'
 
 interface Image {
@@ -71,9 +71,8 @@ function CallBack() {
       }
       return userplaylist
     }
-    const playlistreseach = await researchSpotify(`${genre} ${playlistName}`, 'playlist')
-    console.log('playlistreseach', playlistreseach.playlists.items[0])
-    return playlistreseach.playlists.items[0]
+    const playlistreseach = await researchSpotify([ genre, playlistName ], 'playlist')
+    return playlistreseach
   }
 
   const recuperateAllMusic = async (playlistId: string) => {
@@ -121,7 +120,7 @@ function CallBack() {
           titre: element.track.name,
           artiste: element.track.artists.map(artist => artist.name).join(', '),
           album: element.track.album.name,
-          albumimg: element.track.album.images[0].url,
+          albumimg: element.track.album.images[0]?.url,
           id: element.track.id,
           playlist: playlist,
           playlistimg: playlistId.images[0].url,
