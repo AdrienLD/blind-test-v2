@@ -49,3 +49,15 @@
 .Inline {
     width: 100%;
 }
+
+.PlaylistCard .DeletePlaylistIcon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+  
+/* Change la couleur de l'icône au survol */
+.PlaylistCard .DeletePlaylistIcon:hover {
+    color: red;
+}
