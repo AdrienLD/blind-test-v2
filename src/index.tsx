@@ -4,7 +4,6 @@ import './index.css'
 import reportWebVitals from './reportWebVitals'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import PlaylistSelection from './PlaylistSelection/PlaylistSelection'
-import Logo from './Components/Images/Songs-logo.png'
 import BlindGame from './Components/BlindGame/BlindGame'
 import CallBack from './Components/CallBack'
 import PLParoles from './Components/PLParoles/PLParoles'
@@ -15,7 +14,7 @@ const root = ReactDOM.createRoot(
 )
 root.render(
   <React.StrictMode>
-    <img className='logo' src={Logo} alt="logo" />
+    <img className='logo' src='/images/Songs-logo.png' alt="logo" />
     <div className="content">
       
       <Router>

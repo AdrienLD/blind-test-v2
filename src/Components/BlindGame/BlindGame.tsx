@@ -2,12 +2,13 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './BlindGame.sass'
-import { getSpotifyAction } from '../Playlist'
+import { getSpotifyAction } from '../../Common/Playlist'
 import { decryptPlaylist } from './SpotifyAPI'
 import AffichageReponse from './AffichageReponse'
 import AffichageQuestion from './AffichageQuestion'
 import { sleep } from './utils'
 import DialogRules, { RulesParams } from './DialogRules/DialogRules'
+import { nextmusique } from '../../Common/GameAction'
 
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
@@ -56,64 +57,6 @@ function BlindGame() {
     }
   } , [ receivedData ])
 
-  const nextmusique = async () => {
-    getAction('pause', 'PUT')
-    await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
-    sleep(200)
-    let queue = (await getAction('queue', 'GET')).queue
-    let indexMusicinQueue = -1
-    console.log('queue', queue, receivedData[musiqueActuelle+1])
-    for (let index = 0; index < queue.length; index++) {
-      const element = queue[index]
-      if (element.id === receivedData[musiqueActuelle+1].id) {
-        indexMusicinQueue = index
-        break
-      }
-    }
-    if (indexMusicinQueue === -1) {
-      await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
-      sleep(200)
-      queue = (await getAction('queue', 'GET')).queue
-      for (let index = 0; index < queue.length; index++) {
-        const element = queue[index]
-        if (element.id === receivedData[musiqueActuelle+1].id) {
-          indexMusicinQueue = index
-          break
-        }
-      }
-      if (indexMusicinQueue === -1) {
-        console.error('Error while adding music to queue', receivedData[musiqueActuelle+1])
-        localStorage.setItem('CurrentMusic', (musiqueActuelle + 1).toString())
-        setMusiqueActuelle(musiqueActuelle + 1)
-        await sleep(200)
-        nextmusique()
-      }
-      await getAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle+1].id}`, 'POST')
-      sleep(200)
-      queue = (await getAction('queue', 'GET')).queue
-    }
-    const volume = (await getAction('', 'GET')).device.volume_percent
-    await getAction('volume?volume_percent=0', 'PUT')
-    for (let index = 0; index < indexMusicinQueue; index++) {
-      getAction('next', 'POST')
-      getAction('pause', 'PUT')
-    }
-    await getAction('pause', 'PUT')
-    await getAction('next', 'POST')
-    await getAction('pause', 'PUT')
-    console.log('indexMusicinQueue', modeDebut, tempsauDebut, tempsauDebut * 100)
-    if (modeDebut === 'Selectionner') {
-      await getSpotifyAction(`seek?position_ms=${tempsauDebut * 1000}`, 'PUT')
-    } else {
-      const positionAleatoireMs = Math.floor(Math.random() * 60000)
-      await getSpotifyAction(`seek?position_ms=${positionAleatoireMs}`, 'PUT')
-    }
-    await getAction(`volume?volume_percent=${volume}`, 'PUT')
-    await getAction('play', 'PUT')
-    localStorage.setItem('CurrentMusic', (musiqueActuelle + 1).toString())
-    setMusiqueActuelle(musiqueActuelle + 1)
-    setAffichage('Question-Playing')
-  }
     
 
   const Answered = async () => {
@@ -135,19 +78,27 @@ function BlindGame() {
   
   React.useEffect(() => {
     affichageRef.current = affichage
-    if (affichage === 'Question-Playing') {
-      getAction('play', 'PUT')
+  
+    const executeAsyncOperation = async () => {
+      if (affichage === 'Question-Playing') {
+        getAction('play', 'PUT')
+      } else if (affichage === 'Question-Loading') {
+        // Supposons que nextmusique est asynchrone et renvoie l'index de la nouvelle musique actuelle
+        const musique = await nextmusique(receivedData, musiqueActuelle, modeDebut, tempsauDebut)
+        if (musique === -1) {
+          setSpotifyEteint(true)
+        } else {
+          setMusiqueActuelle(musique)
+          setAffichage('Question-Playing')
+        }
+      } else if (affichage === 'Question-Answered') {
+        Answered()
+      } else if (affichage === 'Reponse') {
+        getAction('play', 'PUT')
+      }
     }
-    if (affichage === 'Question-Loading') {
-      nextmusique()
-    }
-    if (affichage === 'Question-Answered') {
-      Answered()
-    }
-    if (affichage === 'Reponse') {
-      getAction('play', 'PUT')
-    }
-  }, [ affichage ])
+    executeAsyncOperation()
+  }, [ affichage, nextmusique, receivedData, musiqueActuelle, modeDebut, tempsauDebut, Answered ])
   
 
   

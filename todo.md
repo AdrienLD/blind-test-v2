@@ -20,17 +20,17 @@
 - [x] Sauvegarder numero musique actuelle / reutiliser
 - [x] Sauvegarder Ajouts
 - [x] Image fenetre Ajouts playlist pour comprendre
-- [ ] Ajout retour bugs
-- [ ] Première fenetre pas Mes Playlists
+- [x] Première fenetre pas Mes Playlists
 - [ ] Boutton passer musique et Réponse
 - [ ] Rajouter NPLP
 - [x] Supprimer playlist perso ajoutée
-- [ ] Formatter meilleure recherche playlist
+- [x] Formatter meilleure recherche playlist
 
 - [ ] Bugs : 
     - [x] Optimiser volume bug file attente
-    - [ ] Erreur playlist inexistante
+    - [x] Erreur playlist inexistante
     - [x] Erreur Compte spotify éteint
+    - [ ] Ajout retour bugs
 
 - [ ] Mettre en public sur github
 - [ ] Dossier à Spotify

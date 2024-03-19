@@ -4,12 +4,13 @@
 
 
 
+
 export const playlist = [
-  [ 'Années' , [ '50', '60', '70', '80', '90', '2000', '2010', '2020', '2023' ] ],
+  [ 'Années' , [ '50', '60', '70', '80', '90', '2000', '2010' ] ],
   [ 'Genres' , [ 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde' ] ],
   [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga' ] ],
-  [ 'Télévision' , [ 'Films', 'Gen Séries TV', 'Dessins animés', 'Anime Opening', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités' ] ],
-  [ 'Langues' , [ 'Chanson française', 'Rock Français', 'Rap Français' ] ]
+  [ 'Télévision' , [ 'Films', 'séries tv', 'Séries Dessins Animés', 'Anime Opening', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités' ] ],
+  [ 'Français' , [ 'Hits', 'Rock', 'Rap', 'Variétée' ] ]
 ]
 
 export const playlistUtilisateur = [
@@ -33,7 +34,6 @@ const API_URL = 'http://localhost:4000/api'
 
 
 const verifyToken = async (data, action) => {
-  console.log('data', data)
   if (data.status === 401 || !data || data.error?.status === 401) {
     console.error('Spotify déconnecté')
     await getSpotifyToken()
@@ -68,13 +68,33 @@ export async function getSpotifyToken() {
   if (!result.token) await SpotifyToken('gettoken')
 }
 
-export async function researchSpotify(recherche, type) {
+export async function researchSpotify(playlist, type) {
+  let recherche
+  switch (playlist[0]){
+    case 'Années':
+      recherche = `Années ${playlist[1]}`
+      break
+    case 'Genres':
+      recherche = `${playlist[1]} Classics`
+      break
+    case 'Artistes':
+      recherche = `This is ${playlist[1]}`
+      break
+    case 'Télévision':
+      recherche = `musiques de ${playlist[1]}`
+      break
+    case 'Français':
+      recherche = `gen ${playlist[1]} Français`
+      break
+  }
   try {
     const response = await fetch(`${API_URL}/research`, fetchOptions('POST', { titre: recherche, type }))
     const erreur = await verifyToken(response, () => researchSpotify(recherche, type))
     if (erreur) return erreur
     const data = await response.json()
-    return data
+    const topTenItems = data.playlists.items.slice(0, 10)
+    const playlistFound = topTenItems.find(playlist => playlist.owner.uri === 'spotify:user:spotify')
+    return playlistFound || data.playlists.items[0]
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error

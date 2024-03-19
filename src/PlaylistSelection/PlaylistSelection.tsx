@@ -3,7 +3,7 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { getSpotifyToken, playlist, secretKey } from '../Components/Playlist'
+import { getSpotifyToken, playlist, secretKey } from '../Common/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
@@ -42,7 +42,9 @@ const PlaylistSelection: React.FC = () => {
 
   const isTokenFetched = React.useRef(false)
   React.useEffect(() => {
-    setPlaylistsAfficher(userPlaylist)
+    if (PlaylistsAfficher[0] === 'UserPlaylist') {
+      setPlaylistsAfficher(userPlaylist)
+    }
   }, [ userPlaylist ])
 
   React.useEffect(() => {

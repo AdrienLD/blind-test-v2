@@ -151,7 +151,6 @@ app.get('/api/playpause', async (req, res) => {
 
     if (response.ok && response.status !== 204) {
       const data = await response.json()
-      console.log(data)
       res.json(data)
     } else {
       console.log('Réponse réussie sans corps de contenu.')
@@ -191,7 +190,6 @@ app.post('/api/newplaylist', async (req, res) => {
     })
 
     const data = await response.json()
-    console.log(data)
     res.json(data)
   } catch (error) {
     console.error('Error fetching player state:', error)
