@@ -44,7 +44,7 @@ function AffichageQuestion ({ musique, affichage, setAffichage, temps }: Afficha
       <div className="infos">
         <p className='TitrePlaylist'>Playlist : {musique.playlist.split(' £ ')[1]}</p>
         {affichage === 'Question-Loading' && <Chargement />}
-        {affichage === 'Question-Playing' && <Countdown duration={temps*1000} onFinish={() => setAffichage('Question-Answered')}/>}
+        {affichage === 'Question-Playing' && <><Countdown duration={temps*1000} onFinish={() => setAffichage('Question-Answered')}/><button onClick={() => setAffichage('Question-Loading')}>Passer</button></>}
         {affichage === 'Question-Answered' && <div className='Question-Answered'>
           <button onClick={moreTime}>+ de temps</button>
           <button onClick={response}>Réponse</button>

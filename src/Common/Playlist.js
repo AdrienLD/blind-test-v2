@@ -168,3 +168,22 @@ export async function searchNewSpotifyPlaylist(playlistId) {
   }
 }
 
+export async function getLyricsId(musiqueId) {
+  try {
+    const response = await fetch('http://localhost:4000/api/getlyricsId', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        titreid: musiqueId
+      }
+    })
+    const data = await response.json()
+    console.log(data)
+    return data.lyrics.lines  // Retourner les données reçues
+
+  } catch (error) {
+    console.error('Erreur lors de l\'échange du code:', error)
+    return 'Lyrics non trouvés'
+  }
+}
+

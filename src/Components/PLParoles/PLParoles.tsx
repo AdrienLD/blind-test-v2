@@ -1,31 +1,64 @@
-
-/*
 import React from 'react'
-import { useLocation } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
-import './PLParoles.css'
-import Countdown from '../VisuelQuestion/Countdown/Countdown'
-import { getSpotifyAction } from '../Playlist'
+import './PLParoles.sass'
+import { decryptPlaylist } from '../BlindGame/SpotifyAPI'
+import { getLyricsId, getSpotifyAction } from '../../Common/Playlist'
+import { nextmusique } from '../../Common/GameAction'
+import { sleep } from '../BlindGame/utils'
+import AffichageQuestion from './AffichageQuestion'
+import AffichageReponse from './AffichageReponse'
 
 function PLParoles() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
-  const [ affichage, setAffichage ] = React.useState(0)
-  const [ infiniteloop, setInfiniteloop ] = React.useState(false)
-  const lyrics = React.useRef<Array<{ startTimeMs: string, words: string }>>([])
-  const position = React.useRef(0)
-  const timestart = React.useRef(0)
-  const [ startmusic, setStartmusic ] = React.useState(false)
+  const [ parolesActuelles, setParolesActuelles ] = React.useState<Array<{ startTimeMs: string, words: string }>>([])
+  const [ affichage, setAffichage ] = React.useState('Chargement')
+  const [ receivedData, setReceivedData ] = React.useState<Musique[]>([])
+  const [ position, setPosition ] = React.useState(0)
   const [ lyricsJSX, setLyricsJSX ] = React.useState<React.ReactElement | null>(null)
-  const location = useLocation()
-  const receivedData: Musique[] = location.state?.playlist
-  let affichagesuivant = 4
+  const [ affichageprecedent, setAffichageprecedent ] = React.useState(4)
+  const [ affichagesuivant, setAffichagesuivant ] = React.useState(4)
+  const [ spotifyEteint, setSpotifyEteint ] = React.useState(false)
     
+  const getAction = async (action: string, method: string) => {
+    const response = await getSpotifyAction(action, method)
+    if (!response) return
+    if (response.status === 404) {
+      setSpotifyEteint(true)
+    }
+    return response
+  }
+
+  
+  React.useEffect(() => {
+    if (receivedData.length > 0) {
+      setAffichage('Question-Loading')
+    }
+  } , [ receivedData ])
+
     
+  React.useEffect(() => {
+    const ciphertext = localStorage.getItem('playlistFinale')
+    if (ciphertext) {
+      setReceivedData(decryptPlaylist(ciphertext))
+    } else {
+      console.error('No playlist found in local storage')
+      return
+    }
+    const currentMusic = localStorage.getItem('CurrentMusic')
+    if (currentMusic) {
+      if (currentMusic === '0') setMusiqueActuelle(0)
+      else setMusiqueActuelle(parseInt(currentMusic)-1)
+    } else {
+      setMusiqueActuelle(0)
+    }
+  }, [])
+
   function transformString(input: string) {
+    if (!input) return ''
     return input.split('').map(char => {
       if (char === ' ') {
         return ' '
-      } else if (char.match(/[a-zA-Zéïèàùç]/)) {
+      } else if (char.match(/[a-zA-Zéïèàùç0-9]/)) {
         return '_'
       } else {
         return char
@@ -33,209 +66,122 @@ function PLParoles() {
     }).join('')
   }
 
-  React.useEffect(() => {
-    console.log('musiqueActuelle', startmusic)
-    if (!startmusic) return
+  React.useEffect(( ) => {
+    const updateLyrics = async (musique: number) => {
+      const currLyric = parolesActuelles[position] ?? { startTimeMs: '0', words: '' }
+      const nextLyric = parolesActuelles[position + 1] ?? { startTimeMs: '0', words: '' }
+      setLyricsJSX(
+        <div className='paroles'>
+          <div className="secondaires">
+            {parolesActuelles[position - 3]?.words ?? '   '}
 
-    let isCancelled = false // Pour suivre si le composant est démonté
-
-    const updateLyrics = async () => {
-      if (!lyrics.current) return
-      while (position.current < lyrics.current.length && !isCancelled) {
-        const currLyric = lyrics.current[position.current]
-        const nextLyric = lyrics.current[position.current + 1]
-        if (!currLyric || !nextLyric) break
-        console.log('lyrics', lyrics.current, position.current, currLyric, nextLyric)
-
-        console.log('Adrien', affichagesuivant)
-        setLyricsJSX(
-          <div className='paroles'>
-            <div className="secondaires">
-              {affichagesuivant < 0 ? lyrics.current[position.current - 3]?.words : '   '}
-
-            </div>
-            <div className="secondaires">
-              {affichagesuivant < 1 ? lyrics.current[position.current - 2]?.words : '   '}
-
-            </div>
-            <div className="secondaires">
-              {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
-
-            </div>
-            <div className="primaires">
-              {affichagesuivant === -1 ? transformString(lyrics.current[position.current]?.words) : lyrics.current[position.current]?.words}
-            </div>
-            <div className="secondaires">
-              {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(lyrics.current[position.current + 1]?.words) : lyrics.current[position.current + 1]?.words : '   '}
-            </div>
-            <div className="secondaires">
-              {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(lyrics.current[position.current + 2]?.words) : lyrics.current[position.current + 2]?.words : '   '}
-            </div>
-            <div className="secondaires">
-              {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(lyrics.current[position.current + 3]?.words) : lyrics.current[position.current + 3]?.words : '   '}
-            </div>
           </div>
+          <div className="secondaires">
+            {parolesActuelles[position - 2]?.words ?? '   '}
 
-        )
+          </div>
+          <div className="secondaires">
+            {parolesActuelles[position - 1] ? parolesActuelles[position - 1].words : '   '}
 
-        if (affichagesuivant < 0) {
-          await getSpotifyAction('pause', 'PUT')
-          setStartmusic(false)
-          break
-        }
-        position.current++
-        infiniteloop === false ? affichagesuivant-- : affichagesuivant++
-
-        if (affichagesuivant === 0) {
-          await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs) - 600)
-        } else {
+          </div>
+          <div className="primaires">
+            {affichagesuivant === -1 ? transformString(parolesActuelles[position]?.words) : parolesActuelles[position]?.words}
+          </div>
+          <div className="secondaires">
+            {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(parolesActuelles[position + 1]?.words) : parolesActuelles[position + 1]?.words : '   '}
+          </div>
+          <div className="secondaires">
+            {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(parolesActuelles[position + 2]?.words) : parolesActuelles[position + 2]?.words : '   '}
+          </div>
+          <div className="secondaires">
+            {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(parolesActuelles[position + 3]?.words) : parolesActuelles[position + 3]?.words : '   '}
+          </div>
+        </div>
+      )
+      if (musique === musiqueActuelle) {
+        if (affichagesuivant === 0 && affichage === 'Question-Playing') {
+          await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs) - 100)
+          setAffichagesuivant(affichagesuivant - 1)
+          setPosition(position + 1)
+          getAction('pause', 'PUT')
+        } else if (affichagesuivant > 0) {
           await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs))
-
+          setAffichagesuivant(affichagesuivant - 1)
+          setPosition(position + 1)
+        } else if (affichage !== 'Reponse')setAffichage('Question-Answered')
+        else if (currLyric.words === '') {
+          await sleep(receivedData[musiqueActuelle].duration - parseInt(parolesActuelles[parolesActuelles.length - 1].startTimeMs) )
+          setAffichage('Question-Loading')
         }
-
       }
     }
+    if (affichage === 'Question-Playing' || affichage=== 'Reponse') updateLyrics(musiqueActuelle)
+  }, [ affichagesuivant, affichage ])
 
-    updateLyrics()
-
-    return () => {
-      isCancelled = true // Mettre à jour le flag lors du nettoyage
+  const getRandomStartTime = async (musique: number) => {
+    let paroles = await getLyricsId(receivedData[musique].id)
+    console.log('paroles', paroles, paroles === 'Lyrics non trouvés')
+    while (paroles === 'Lyrics non trouvés') {
+      sleep(1000)
+      musique++
+      paroles = await getLyricsId(receivedData[musique].id)
+      console.log('paroles', paroles, paroles === 'Lyrics non trouvés', receivedData[musique].id)
     }
-  }, [ startmusic, lyrics, position, setLyricsJSX, musiqueActuelle ])
-
-
-  function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
-  async function getlyricsId() {
-    try {
-      const response = await fetch('http://localhost:4000/api/getlyricsId', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          titreid: receivedData[musiqueActuelle].id
-        }
-      })
-      const data = await response.json()
-      return data  // Retourner les données reçues
-
-    } catch (error) {
-      console.error('Erreur lors de l\'échange du code:', error)
-      throw error // Propager l'erreur pour pouvoir la gérer dans listemusiques
-    }
-  }
-
-  const nextmusique = async () => {
-    await getSpotifyAction('pause', 'PUT')
-    setMusiqueActuelle(musiqueActuelle + 1)
-    setStartmusic(false)
-    setInfiniteloop(false)
-    setAffichage(0)
-  }
-
-  const getRandomStartTime = async () => {
-    const limit = receivedData[musiqueActuelle].duration * 0.5
-    const debut = Math.floor(Math.random() * limit)
-    const paroles = await getlyricsId()
-    if (paroles.error === false && paroles.lines[2]) {
-      let i = 0
-      while (parseInt(paroles.lines[i].startTimeMs) < debut && paroles.lines[i + affichagesuivant] === '♪') {
-        console.log('lyrics i', paroles.lines[i].startTimeMs, i)
-        i++
+    if (paroles.length > 0) {
+      let randomIndex = Math.floor(Math.random() * (paroles.length - 5))
+      let randandaffichage = randomIndex + affichageprecedent
+      console.log('paroles dans rand', paroles[randandaffichage + 1])
+      while (paroles[randandaffichage + 1].words === '♪' || paroles[randandaffichage + 1].words === '' || paroles[randandaffichage + 1].words === paroles[randandaffichage].words) {
+        randomIndex = Math.floor(Math.random() * (paroles.length - 5))
+        randandaffichage = randomIndex + affichageprecedent
       }
-      getSpotifyAction('next', 'POST')
-      await getSpotifyAction(`seek?position_ms=${paroles.lines[i].startTimeMs}`, 'PUT')
-      lyrics.current = paroles.lines
-      position.current = i
-      timestart.current = parseInt(paroles.lines[i].startTimeMs)
-      console.log('lyrics', lyrics.current)
-    } else { nextmusique() }
-
+      const timer = parseInt(paroles[randomIndex].startTimeMs)
+      getAction('seek?position_ms=' + timer, 'PUT')
+      setPosition(randomIndex)
+      setParolesActuelles(paroles)
+      setAffichageprecedent(4)
+    } else { setAffichage('Question-Loading') }
   }
 
-  const startmusique = async () => {
-    await getSpotifyAction(`queue?uri=spotify%3Atrack%3A${receivedData[musiqueActuelle].id}`, 'POST')
-    await sleep(100)
-    await getRandomStartTime()
-    await setAffichage(1)
-    affichagesuivant = 3
-    setStartmusic(true)
-  }
-
-  const continuer = async () => {
-    setInfiniteloop(true)
-    setStartmusic(true)
-    await getSpotifyAction('play', 'PUT')
-  }
-
-  const response = async () => {
-    setLyricsJSX(
-      <div className='paroles'>
-        <div className="secondaires">
-          {lyrics.current[position.current - 3] ? lyrics.current[position.current - 3].words : '   '}
-        </div>
-        <div className="secondaires">
-          {lyrics.current[position.current - 2] ? lyrics.current[position.current - 2].words : '   '}
-        </div>
-        <div className="secondaires">
-          {lyrics.current[position.current - 1] ? lyrics.current[position.current - 1].words : '   '}
-        </div>
-        <div className="primaires">
-          {lyrics.current[position.current]?.words}
-        </div>
-        <button onClick={() => continuer()}>Continuer</button>
-      </div>
-
-    )
-  }
+  React.useEffect(() => {
+    const executeAsyncOperation = async () => {
+      if (affichage === 'Question-Loading') {
+        console.log('musiqueActuelle', musiqueActuelle, affichagesuivant) 
+        setAffichagesuivant(-1)
+        const musique = await nextmusique(receivedData, musiqueActuelle, 'Selectionner', 0)
+        
+        if (musique === -1) {
+          setSpotifyEteint(true)
+        } else {
+          console.log('musique', affichagesuivant)
+          setMusiqueActuelle(musique)
+          await getRandomStartTime(musique)
+          await setAffichagesuivant(4)
+          setAffichage('Question-Playing')
+        }
+      
+      } else if (affichage === 'Reponse') {
+        setAffichagesuivant(parolesActuelles.length - position)
+        getAction('seek?position_ms=' + parolesActuelles[position].startTimeMs, 'PUT')
+        getAction('play', 'PUT')
+      }
+    }
+    executeAsyncOperation()
+  }, [ affichage ])
 
   
 
 
   return (
     <div>
-      <h1>N'Oubliez pas les Paroles !</h1>
-      <script type="text/javascript" src="https://tracking.musixmatch.com/t1.0/m_img/e_1/sn_0/l_19915235/su_0/rs_0/tr_3vUCADZOeQ2EJZus_nq7GH01wP79qOxU-KWYz3bsrUtZ9_14VvzJM6e48M0i-V0_D17XhCqc4KoDkUTfWRWrFSa3ZRaeS8-UkymCNQntabWoeSZQMic7SuKwzoSLsBh6LeQ5TrPqTkzuDNDqlPb547uzG1-aOSdsrOAfM4z4EO-6phAf-Xs2Z1fA_hwVGTxahZ8VIecsHnQOvQLuq4uE7ku1I8ez_jQUBIiFV1dFepqUOA3D0hFVtd2VXbwurF4-MYtYkReTr5bjcDFwe6NV2HQvBuD0ddXwtpH4IE9mnnnNGHDp85eEVlCegDKHyM1hpH-qWERgcPkM8n1kKM13sJAU2Qw5tbTxoyhYI96pMLYoGG_8qV2MRHj8lI7mMTlLVPn_LD3VMqUlXV6UXtFNUsxEC75iLSGQcJp_/"></script>
-      {
-        affichage < 2? <div className='VisuelQuestion'>
-          <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
-          <div className="infos">
-            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
-            {affichage === 0 ? <Countdown />: <div>
-              {lyricsJSX}
-              <button onClick={() => nextmusique()}>Passer</button>
-              <button onClick={() => response()}>Réponse</button>
-            </div>
-            }
-          </div>
-        </div>: <div className='VisuelQuestion'>
-          <img src={receivedData[musiqueActuelle].albumimg} alt='pochette playlist' className='PochetteAlbum' />
-          <div className="infos">
-            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].titre}</p>
-            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].artiste}</p>
-            <p className='TitrePlaylist'>{receivedData[musiqueActuelle].album}</p>
-            {
-              <div>
-                <button onClick={nextmusique}>Musique suivante</button>
-              </div>
-            }
-          </div>
-        </div>
+      {spotifyEteint ? <h2>Spotify est éteint</h2>: <><h2>N'oubliez Pas Les Paroles - Musique : {musiqueActuelle}</h2>
+        <div className="content">
+          { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} /> }
+          { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX} /> }
+        </div> </>
       }
     </div>
   )
-}
-
-export default PLParoles
-  */
-function PLParoles() {
-  return (
-    <div>
-      <h1>PLParoles</h1>
-    </div>
-  )
-
 }
 
 export default PLParoles
