@@ -21,12 +21,12 @@ const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 app.post('/api/gettoken', async (req, res) => {
-  console.log('gettoken')
+  console.log('gettoken', CLIENT_ID, CLIENT_SECRET)
   const action = req.body.action
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
-  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/ChoosePlaylist') : null
+  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/Auth') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
@@ -34,13 +34,15 @@ app.post('/api/gettoken', async (req, res) => {
   }
 
   try {
+    console.log('params', params , headers)
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       body: params,
       headers: headers,
       credentials: 'include'
     })
-    const data = await response.json()     
+    const data = await response.json()    
+    console.log('data', data) 
     if (data.access_token) res.cookie('token', data.access_token, { httpOnly: true })
     if (data.refresh_token) res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
     res.send(data)
@@ -115,8 +117,8 @@ app.post('/api/tracks', async (req, res) => {
 app.get('/api/getplayerstate', async (req, res) => {
   try {
     const token = req.cookies.token
-    console.log('getplayserestat')
-    const response = await fetch('https://api.spotify.com/v1/me/player', {
+    console.log('getplayerstate', token)
+    const response = await fetch('https://api.spotify.com/v1/me', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -209,25 +211,6 @@ app.post('/api/newplaylist', async (req, res) => {
     console.error('Error fetching player state:', error)
     res.status(500).send('Internal Server Error')
   }
-})
-
-app.get('/api/start-auth', (req, res) => {
-  const spotifyScopes = [
-    'user-read-playback-state',  // Accès en lecture à l'état de lecture courant de l'utilisateur
-    'user-modify-playback-state', // Permet de contrôler la lecture sur les appareils de l'utilisateur
-    'user-read-currently-playing', // Accès aux informations sur la piste actuellement en lecture
-    'streaming', // Utilisation de l'API Web Playback SDK pour lire du contenu dans le navigateur
-    'playlist-read-private', // Accès aux playlists privées de l'utilisateur
-    'playlist-read-collaborative', // Accès aux playlists collaboratives de l'utilisateur
-    'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
-  ]
-
-  const REDIRECT_URI = 'http://localhost:3000/ChoosePlaylist'
-  const CLIENT_ID = process.env.CLIENT_ID
-  
-  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${spotifyScopes.join('%20')}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
-  
-  res.redirect(authUrl)
 })
 
 app.listen(4000, () => {

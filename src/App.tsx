@@ -1,13 +1,12 @@
 import React from 'react'
 import './App.css'
+import { authentificate } from './Common/Playlist'
 
 function App() {
   
 
-  const authentificate = () => {
-    
-    window.location.href = 'http://localhost:4000/api/start-auth'
-  }
+  
+
   return (
     <div className="App">
       <h2>
@@ -33,7 +32,7 @@ function App() {
 
         <h3>Commencez dès maintenant ! Connectez vous à votre plateforme préférée : </h3>
         <div className="logosmusique">
-          <img src="/images/Spotify.png" alt="Spotify" onClick={authentificate}/>
+          <img src="/images/Spotify.png" alt="Spotify" onClick={() => authentificate('')}/>
           <img src="/images/Deezer.png" style={{ filter: 'grayscale(70%)' }} alt="Deezer" />
           <img src="/images/AppleMusic.png" style={{ filter: 'grayscale(70%)' }} alt="AppleMusic" />
         </div>
