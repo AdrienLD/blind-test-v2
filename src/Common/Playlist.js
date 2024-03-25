@@ -34,6 +34,7 @@ const API_URL = 'http://localhost:4000/api'
 
 
 const verifyToken = async (data, action) => {
+  console.log('data', data)
   if (data.status === 401 || !data || data.error?.status === 401) {
     console.error('Spotify déconnecté')
     await getSpotifyToken()
@@ -52,6 +53,7 @@ const verifyToken = async (data, action) => {
 
 async function SpotifyToken(action){
   try {
+    console.log('action', action)
     const response = await fetch(`${API_URL}/gettoken`, fetchOptions('POST', { action, code: window.location.search.split('=')[1] }))
     const erreur = await verifyToken(response, () => SpotifyToken(action))
     if (erreur) return erreur
@@ -63,9 +65,25 @@ async function SpotifyToken(action){
   }
 }
 
+export async function getUserInfos() {
+  try {
+    const adminInfos = await fetch (`${API_URL}/getplayerstate`, fetchOptions('GET'))
+    const erreur = await verifyToken(adminInfos, () => getUserInfos())
+    if (erreur) return erreur
+    const adminData = await adminInfos.json()
+    console.log('adminData', adminData)
+    return adminData
+  } catch (error) {
+    console.error('Erreur lors de l\'échange du code:', error)
+    throw error
+  }
+}
+
 export async function getSpotifyToken() {
-  const result = await SpotifyToken('refreshToken')
-  if (!result.token) await SpotifyToken('gettoken')
+  let result = await SpotifyToken('refreshToken')
+  console.log('result', result)
+  if (!result.token) result = await SpotifyToken('gettoken')
+  return result
 }
 
 export async function researchSpotify(playlist, type) {
@@ -187,3 +205,22 @@ export async function getLyricsId(musiqueId) {
   }
 }
 
+export const authentificate = (add) => {
+  const spotifyScopes = [
+    'user-read-playback-state',  // Accès en lecture à l'état de lecture courant de l'utilisateur
+    'user-modify-playback-state', // Permet de contrôler la lecture sur les appareils de l'utilisateur
+    'user-read-currently-playing', // Accès aux informations sur la piste actuellement en lecture
+    'streaming', // Utilisation de l'API Web Playback SDK pour lire du contenu dans le navigateur
+    'playlist-read-private', // Accès aux playlists privées de l'utilisateur
+    'playlist-read-collaborative', // Accès aux playlists collaboratives de l'utilisateur
+    'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
+  ]
+
+  const REDIRECT_URI = 'http://localhost:3000/Auth'
+  const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
+
+  console.log('CLIENT_ID', CLIENT_ID, `redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`)
+  
+  window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${spotifyScopes.join('%20')}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`
+  
+}

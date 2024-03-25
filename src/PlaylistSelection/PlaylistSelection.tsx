@@ -3,7 +3,7 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { getSpotifyToken, playlist, secretKey } from '../Common/Playlist'
+import { authentificate, getUserInfos, playlist, secretKey } from '../Common/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
@@ -32,6 +32,7 @@ const PlaylistSelection: React.FC = () => {
   const [ userPlaylistInfos, setUserPlaylistInfos ] = React.useState<string[][]>(localStorage.getItem('userPlaylistInfos') ? JSON.parse(localStorage.getItem('userPlaylistInfos') as string) : [ [ 'Ajouter', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/1200px-PlusCM128.svg.png', '' ] ])
   const playlistSelections = playlist
   const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState<[string, string[]]>(playlistSelections[0])
+  const [ User, setUser ] = React.useState<any>()
 
   const [ PlaylistsSelectionnees, setPlaylistsSelectionnees ] = React.useState<string[]>(() => {
     const playlistsJson = localStorage.getItem('playlists')
@@ -40,7 +41,6 @@ const PlaylistSelection: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const isTokenFetched = React.useRef(false)
   React.useEffect(() => {
     if (PlaylistsAfficher[0] === 'UserPlaylist') {
       setPlaylistsAfficher(userPlaylist)
@@ -48,28 +48,20 @@ const PlaylistSelection: React.FC = () => {
   }, [ userPlaylist ])
 
   React.useEffect(() => {
-    const playlist = localStorage.getItem('playlists')
-    if (playlist) {
-      console.log('playlist', playlist)
-      setPlaylistsSelectionnees(JSON.parse(playlist))
-    }
-  }, [])
-
-  React.useEffect(() => {
     localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
   }, [ PlaylistsSelectionnees ])
 
   React.useEffect(() => {
+    async function getUser () {
+      const user = await getUserInfos()
+      console.log('user', user)
+      setUser(user)
+    }
+
     const nomsPlaylists = userPlaylistInfos.map(playlist => playlist[0])
     setUserPlaylist([ 'UserPlaylist', nomsPlaylists ])
     setPlaylistsAfficher(playlistSelections[0])
-  }, [])
-
-  React.useEffect(() => {
-    if (!isTokenFetched.current) {
-      getSpotifyToken()
-      isTokenFetched.current = true
-    }
+    getUser()
   }, [])
   
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -213,12 +205,24 @@ const PlaylistSelection: React.FC = () => {
       setUserPlaylistInfos(newPlaylistsInfos)
     }
   }
+  const changeAccount = () => {
+    authentificate('&show_dialog=true')
+  }
 
   return (
     <div className='PlaylistSelection'>
       <h2>
                 Choisissez les playlists que vous voulez avoir dans votre BlindTest
       </h2>
+      { 
+        User && <div className='UserInfos' onClick={() => changeAccount()}>
+          <img src={User.images[0].url} alt='user' className='UserImage'/>
+          <div className="UserText">
+            <div className='UserName'>{User.display_name}</div>
+            <div className="info">Cliquez pour changer d'utilisateur</div>
+          </div>
+        </div>
+      }
       <div className="listPlaylists">
                 
         <div className='catalogue'>
@@ -288,6 +292,7 @@ const PlaylistSelection: React.FC = () => {
       <DialogGameChoice open={open} onClose={handleClose} extractmusique={extractmusique} />
       <DialogNewPlaylist open={openNewPlaylist} onClose={() => setOpenNewPlaylist(false)} addNewUserPlaylist={addNewUserPlaylist} />
       {showAlert && <Alert  className="alert" variant="filled" severity="error">Vous n'avez sélectionné aucune Playlist</Alert>}
+      
     </div>
   )
 }

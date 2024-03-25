@@ -8,6 +8,7 @@ import BlindGame from './Components/BlindGame/BlindGame'
 import CallBack from './Components/CallBack'
 import PLParoles from './Components/PLParoles/PLParoles'
 import App from './App'
+import Auth from './Auth'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,6 +21,7 @@ root.render(
       <Router>
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/Auth" element={<Auth />} />
           <Route path="/ChoosePlaylist" element={<PlaylistSelection />} />
           <Route path="/callback" element={<CallBack/>} />
           <Route path="/BlindGame" element={<BlindGame/>} />
