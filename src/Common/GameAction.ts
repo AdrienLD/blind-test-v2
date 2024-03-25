@@ -26,6 +26,7 @@ export const nextmusique = async (receivedData : Musique[], musiqueprecedente: n
     await sleep(400)
 
     const volume = (await getAction('', 'GET')).device.volume_percent
+    console.log('volume', volume)
     await getAction('volume?volume_percent=0', 'PUT')
     let queue = (await getAction('queue', 'GET')).queue
     let indexMusicinQueue = queue.findIndex((element: { id: string }) => element.id === receivedData[musiqueActuelle].id)

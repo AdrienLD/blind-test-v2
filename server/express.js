@@ -166,8 +166,22 @@ app.get('/api/playpause', async (req, res) => {
 app.get('/api/getlyricsId', async (req, res) => {
   const titreId = req.headers.titreid
   try {
-    const response = await fetch(`https://spotify-lyric-api-984e7b4face0.herokuapp.com/?trackid=${titreId}`, {
-      method: 'GET'
+    const token = await fetch('https://open.spotify.com/get_access_token', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'cookie': 'sp_dc=AQBnWO3KXmJuHqh9-S5i73RAdi7vugSLVTgQ9NCcGJ5fjn-nhScvEMw5I3rCZw6iPh0heIqU0XklPsJaeyfww4gsqcjo5-RcK2h1K4MIEaskRGwk0hiYXz1-kjQBMeM55x2-LqVLJlkA7L4_AR51oO_Z3RPPZg-v'
+      }
+    })
+    const data2 = await token.json()
+    console.log('getlyricsId', data2.accessToken)
+    const response = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${titreId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${data2.accessToken}`,
+        'App-Platform': 'WebPlayer',
+        'Accept': 'application/json'
+      }
     })
     const data = await response.json()
     res.json(data)
@@ -219,4 +233,3 @@ app.get('/api/start-auth', (req, res) => {
 app.listen(4000, () => {
   console.log('Serveur démarré (port 4000)')
 })
-
