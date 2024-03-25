@@ -3,13 +3,14 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { authentificate, getUserInfos, playlist, secretKey } from '../Common/Playlist'
+import { getUserInfos, playlist, secretKey } from '../Common/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
 import DialogGameChoice from '../Components/Dialog/DialogGameChoice/DialogGameChoice'
 import DialogNewPlaylist from '../Components/Dialog/DialogNewPlaylist/DialogNewPlaylist'
 import { useNavigate } from 'react-router-dom'
+import { authentificate } from '../Common/Auth'
 
 
 
@@ -30,7 +31,7 @@ const PlaylistSelection: React.FC = () => {
   const [ showAlert, setShowAlert ] = React.useState(false)
   const [ userPlaylist, setUserPlaylist ] = React.useState<[string, string[]]>([ 'UserPlaylist', [ 'Ajouter' ] ])
   const [ userPlaylistInfos, setUserPlaylistInfos ] = React.useState<string[][]>(localStorage.getItem('userPlaylistInfos') ? JSON.parse(localStorage.getItem('userPlaylistInfos') as string) : [ [ 'Ajouter', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/PlusCM128.svg/1200px-PlusCM128.svg.png', '' ] ])
-  const playlistSelections = playlist
+  const playlistSelections: Array<[string, string[]]> = playlist
   const [ PlaylistsAfficher, setPlaylistsAfficher ] = React.useState<[string, string[]]>(playlistSelections[0])
   const [ User, setUser ] = React.useState<any>()
 
