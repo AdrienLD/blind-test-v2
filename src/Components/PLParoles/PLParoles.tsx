@@ -68,37 +68,37 @@ function PLParoles() {
 
   React.useEffect(( ) => {
     const updateLyrics = async (musique: number) => {
-      const currLyric = parolesActuelles[position] ?? { startTimeMs: '0', words: '' }
-      const nextLyric = parolesActuelles[position + 1] ?? { startTimeMs: '0', words: '' }
-      setLyricsJSX(
-        <div className='paroles'>
-          <div className="secondaires">
-            {parolesActuelles[position - 3]?.words ?? '   '}
-
-          </div>
-          <div className="secondaires">
-            {parolesActuelles[position - 2]?.words ?? '   '}
-
-          </div>
-          <div className="secondaires">
-            {parolesActuelles[position - 1] ? parolesActuelles[position - 1].words : '   '}
-
-          </div>
-          <div className="primaires">
-            {affichagesuivant === -1 ? transformString(parolesActuelles[position]?.words) : parolesActuelles[position]?.words}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(parolesActuelles[position + 1]?.words) : parolesActuelles[position + 1]?.words : '   '}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(parolesActuelles[position + 2]?.words) : parolesActuelles[position + 2]?.words : '   '}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(parolesActuelles[position + 3]?.words) : parolesActuelles[position + 3]?.words : '   '}
-          </div>
-        </div>
-      )
       if (musique === musiqueActuelle) {
+        const currLyric = parolesActuelles[position] ?? { startTimeMs: '0', words: '' }
+        const nextLyric = parolesActuelles[position + 1] ?? { startTimeMs: '0', words: '' }
+        setLyricsJSX(
+          <div className='paroles'>
+            <div className="secondaires">
+              {parolesActuelles[position - 3]?.words ?? '   '}
+
+            </div>
+            <div className="secondaires">
+              {parolesActuelles[position - 2]?.words ?? '   '}
+
+            </div>
+            <div className="secondaires">
+              {parolesActuelles[position - 1] ? parolesActuelles[position - 1].words : '   '}
+
+            </div>
+            <div className="primaires">
+              {affichagesuivant === -1 ? transformString(parolesActuelles[position]?.words) : parolesActuelles[position]?.words}
+            </div>
+            <div className="secondaires">
+              {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(parolesActuelles[position + 1]?.words) : parolesActuelles[position + 1]?.words : '   '}
+            </div>
+            <div className="secondaires">
+              {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(parolesActuelles[position + 2]?.words) : parolesActuelles[position + 2]?.words : '   '}
+            </div>
+            <div className="secondaires">
+              {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(parolesActuelles[position + 3]?.words) : parolesActuelles[position + 3]?.words : '   '}
+            </div>
+          </div>
+        )
         if (affichagesuivant === 0 && affichage === 'Question-Playing') {
           await sleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs) - 100)
           setAffichagesuivant(affichagesuivant - 1)
@@ -174,7 +174,7 @@ function PLParoles() {
 
   return (
     <div>
-      {spotifyEteint ? <h2>Spotify est éteint</h2>: <><h2>N'oubliez Pas Les Paroles - Musique : {musiqueActuelle}</h2>
+      {spotifyEteint ? <h2>Spotify est éteint, veuillez le lancer pour jouer, puis recharger la page</h2>: <><h2>N'oubliez Pas Les Paroles - Musique : {musiqueActuelle}</h2>
         <div className="content">
           { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} /> }
           { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX} /> }

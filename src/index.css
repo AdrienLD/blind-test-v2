@@ -54,3 +54,15 @@ h2{
   font-weight: bold;
   position: fixed;
 }
+
+.version{
+  color: rgb(0, 0, 0);
+  font-size: 14px;
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+}
+
+a{
+  text-decoration: none;
+}
