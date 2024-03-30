@@ -16,15 +16,14 @@ code {
 }
 
 .logo{
-  width: 300px;
   margin: 15px auto;
   display: block;
   position: fixed;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 300px;
-  height: auto;
+  height: 115px;
+  width: auto;
 }
 
 button {
