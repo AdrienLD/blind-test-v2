@@ -26,12 +26,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "prod": "serve -s build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start-server": "node server/express.js",
-    "start-both": "concurrently \"npm start\" \"npm run start-server\"",
+    "start-both": "concurrently \"npm start\"  \"npm run start-server\"",
+    "start-both-prod": "concurrently \"serve -s build\" \"npm run start-server\"",
     "update-images": "node src/Components/updateImages.js"
   },
   "eslintConfig": {

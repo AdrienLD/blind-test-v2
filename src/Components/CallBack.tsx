@@ -1,17 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../PlaylistSelection/PlaylistSelection'
-import { extractMusiquesSpotify, researchSpotify, secretKey, testSpotifyToken } from '../Common/Playlist'
+import { replaceThisPlaylist, secretKey  } from '../Common/Playlist'
 import CryptoJS from 'crypto-js'
 
-interface Image {
-  url: string
-}
 
-interface UserMusic {
-  id: string
-  images: Image[] // Utilisez la sous-interface Image ici
-}
 
 function CallBack() {
   const navigate = useNavigate()
@@ -20,41 +13,7 @@ function CallBack() {
 
   const isTokenFetched = React.useRef(false)
 
-  function shuffle(array: Musique[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      // Sélectionnez un index aléatoire
-      const j = Math.floor(Math.random() * (i + 1));
-
-      // Échangez les éléments aux indices i et j
-      [ array[i], array[j] ] = [ array[j], array[i] ]
-    }
-    return array
-  }
-
-  function balanceArrays(playlists: Musique[][]) {
-    const minLength = Math.min(...playlists.map(subArr => subArr.length))
-    playlists = playlists.map(subArr => shuffle(subArr))
-        
-    playlists.forEach((playlist) => {
-      while (playlist.length > minLength) {
-        const randomIndex = Math.floor(Math.random() * playlist.length)
-        playlist.splice(randomIndex, 1)
-      }
-    })
-
-    let flattened = playlists.reduce((acc, curr) => acc.concat(curr), [])
-    flattened = shuffle(flattened)
-
-    let playlistmelange: Musique[] = []
-
-    while (flattened.length) {
-      const randomIndex = Math.floor(Math.random() * flattened.length)
-      playlistmelange.push(flattened[randomIndex])
-      flattened.splice(randomIndex, 1)
-    }
-    playlistmelange = shuffle(playlistmelange)
-    return playlistmelange
-  }
+  /*
 
   const extractplaylistId = async (playlist: string) => {
     const [ genre, playlistName ] = playlist.split(' £ ')
@@ -75,21 +34,7 @@ function CallBack() {
     return playlistreseach
   }
 
-  const recuperateAllMusic = async (playlistId: string) => {
-    let offset = 0
-    let musiques: any[] = []
-    await testSpotifyToken()
-    let response = await extractMusiquesSpotify(playlistId, offset)
-    console.log('response', response) 
-    musiques = musiques.concat(response.items)
-    while (response.next) {
-      offset += 100
-      response = await extractMusiquesSpotify(playlistId, offset)
-      musiques = musiques.concat(response.items)
-    }
-    return musiques
-  }
-
+  */
   const extractmusique = async () => {
     await console.log('extractmusique')
     const playlistfromlocalStorage = localStorage.getItem('playlists')
@@ -97,41 +42,49 @@ function CallBack() {
       console.error('No playlist selected')
     }
     const playlistSelection: string[] = JSON.parse(playlistfromlocalStorage!)
-    console.log('playlistSelection', playlistSelection)
+    const playlistComplete: Musique[] = []
 
-    const playlistComplete: Musique[][] = []
-    for (let index = 0; index < playlistSelection.length; index++) {
-      const playlist = playlistSelection[index]
-      console.log('playlist', playlist)
-      const playlistId = await extractplaylistId(playlist)
-      console.log('playlistId', playlistId)
-      const musiques = await recuperateAllMusic(playlistId.id)
-      console.log('musiques', musiques)
-      playlistComplete.push([])
-      musiques.forEach((element: { track: {
-        duration_ms: any
-        name: any
-        artists: Array<{ name: any }>
-        album: { name: any, images: any }
-        id: any 
+    
+    for (let i = 0; i < playlistSelection.length; i++) {
+      const [ genre, playlistName ] = playlistSelection[i].split(' £ ')
+    
+      if (genre === 'UserPlaylist') {
+        const userPlaylistInfos = JSON.parse(localStorage.getItem('userPlaylistInfos') || '[]')
+    
+        const selectedUserMusic: [string, string, string] | undefined = userPlaylistInfos.find((playlist: [string, string, string]) => playlist[0] === playlistName)
+        if (selectedUserMusic === undefined) {
+          console.error('Invalid selected User Playlist')
+          continue
+        }
+        playlistSelection[i] = `UserPlaylist £ ${selectedUserMusic[2]}`
       }
-      }) => {
-        playlistComplete[index].push({
-          titre: element.track.name,
-          artiste: element.track.artists.map(artist => artist.name).join(', '),
-          album: element.track.album.name,
-          albumimg: element.track.album.images[0]?.url,
-          id: element.track.id,
-          playlist: playlist,
-          playlistimg: playlistId.images[0].url,
-          duration: element.track.duration_ms
-        })
-      })
     }
-    const playlistFinale: Musique[] = balanceArrays(playlistComplete)
-    console.log('playlistFinale', playlistFinale)
 
-    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(playlistFinale), secretKey).toString()
+    const test = await replaceThisPlaylist(playlistSelection)
+    
+    console.log('test', test)
+    test.results.forEach((element: { 
+      duration_ms: any
+      name: any
+      artists: Array<{ name: any }>
+      album: { name: any, images: any }
+      id: any 
+      playlist: any
+    
+    }) => {
+      playlistComplete.push({
+        titre: element.name,
+        artiste: element.artists.map(artist => artist.name).join(', '),
+        album: element.album.name,
+        albumimg: element.album.images[0]?.url,
+        id: element.id,
+        playlist: element.playlist.name,
+        playlistimg: element.playlist.images[0].url,
+        duration: element.duration_ms
+      })
+    })
+
+    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(playlistComplete), secretKey).toString()
     await localStorage.setItem('playlistFinale', ciphertext)
     await localStorage.setItem('CurrentMusic', '0')
     const mode = localStorage.getItem('mode')

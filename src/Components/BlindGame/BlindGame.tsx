@@ -81,10 +81,7 @@ function BlindGame() {
     affichageRef.current = affichage
   
     const executeAsyncOperation = async () => {
-      if (affichage === 'Question-Playing') {
-        getAction('play', 'PUT')
-      } else if (affichage === 'Question-Loading') {
-        // Supposons que nextmusique est asynchrone et renvoie l'index de la nouvelle musique actuelle
+      if (affichage === 'Question-Loading') {
         const musique = await nextmusique(receivedData, musiqueActuelle, modeDebut, tempsauDebut)
         if (musique === -1) {
           setSpotifyEteint(true)

@@ -51,17 +51,19 @@ const PlaylistSelection: React.FC = () => {
     localStorage.setItem('playlists', JSON.stringify(PlaylistsSelectionnees))
   }, [ PlaylistsSelectionnees ])
 
+  async function getUser () {
+    const user = await getUserInfos()
+    console.log('user', user)
+    setUser(user)
+  }
+      
   React.useEffect(() => {
-    async function getUser () {
-      const user = await getUserInfos()
-      console.log('user', user)
-      setUser(user)
-    }
+    console.log('userPlaylistInfos', User)
 
     const nomsPlaylists = userPlaylistInfos.map(playlist => playlist[0])
     setUserPlaylist([ 'UserPlaylist', nomsPlaylists ])
     setPlaylistsAfficher(playlistSelections[0])
-    getUser()
+    if (!User) getUser()
   }, [])
   
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -216,7 +218,7 @@ const PlaylistSelection: React.FC = () => {
       </h2>
       { 
         User && <div className='UserInfos' onClick={() => changeAccount()}>
-          <img src={User.images[0]?.url} 
+          <img src={User.images[0]?.url ?? '/images/S.png'} 
             alt='user' 
             className='UserImage'
             onError={(e) => {
