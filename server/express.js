@@ -8,7 +8,7 @@ import { URLSearchParams } from 'url'
 const app = express()
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://songs.flgr.fr',
   credentials: true
 }
 dotenv.config()
@@ -26,7 +26,7 @@ app.post('/api/gettoken', async (req, res) => {
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
-  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/Auth') : null
+  action === 'gettoken' ? params.append('redirect_uri', 'https://songs.flgr.fr/Auth') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
