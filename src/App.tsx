@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { authentificate } from './Common/Auth'
+import { authentificate } from './Common/Playlist'
 
 function App() {
   
