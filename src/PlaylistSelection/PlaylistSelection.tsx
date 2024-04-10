@@ -216,7 +216,7 @@ const PlaylistSelection: React.FC = () => {
       </h2>
       { 
         User && <div className='UserInfos' onClick={() => changeAccount()}>
-          <img src={User.images[0].url} alt='user' className='UserImage'/>
+          <img src={User.images[0]?.url} alt='user' className='UserImage'/>
           <div className="UserText">
             <div className='UserName'>{User.display_name}</div>
             <div className="info">Cliquez pour changer d'utilisateur</div>
