@@ -18,7 +18,7 @@ function PlaylistCard(props: PlaylistCardProps) {
   const imageafficher = (props.genre === 'UserPlaylist' && userPlaylistInfos) ? userPlaylistInfos[0].find(playlist => playlist[0] === props.nom)?.[1] : imagePath
   const handleImageError = (e:any) => {
     e.target.onerror = null // Pour éviter une boucle infinie en cas d'erreur sur l'image de remplacement
-    e.target.src = '/images/trans.png'
+    e.target.src = '/images/playlists/trans.png'
   }
 
   const handleDeleteClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
@@ -30,17 +30,19 @@ function PlaylistCard(props: PlaylistCardProps) {
   
   return (
     <div className="PlaylistCard" onClick={props.onClick} style={props.choisie ? { transform: 'scale(0.7)' } : {}}>
-      <div className="titre">
-        {props.nom}
-        {props.genre === 'UserPlaylist' && props.nom !== 'Ajouter' && <DeleteIcon className='DeletePlaylistIcon' onClick={handleDeleteClick}/>}
-      </div>
       <div className='Inline'>
         <img src={imageafficher} className='logoplaylist' alt='logoimage' onError={handleImageError}/>
-        {
-          props.choisie && <DoneIcon className='done' />
-        }
+        
         
       </div>
+      <div className="titre">
+        {props.nom}
+      </div>        
+      {props.genre === 'UserPlaylist' && props.nom !== 'Ajouter' && <DeleteIcon className='DeletePlaylistIcon' onClick={handleDeleteClick}/>}
+
+      {
+        props.choisie && <DoneIcon className='done' />
+      }
     </div>
   )
 }

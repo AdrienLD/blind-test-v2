@@ -10,7 +10,7 @@ interface AffichageReponseNPLP {
 
 function AffichageReponse ({ musique, setAffichage, paroles }: AffichageReponseNPLP){
   return (
-    <div className='VisuelQuestion'>
+    <div className='VisuelQuestion PLP'>
       <img src={musique.albumimg} alt='pochette playlist' className='PochetteAlbum' />
       <div className="infos">
         <p className='TitrePlaylist'>{musique.titre} by {musique.artiste}</p>

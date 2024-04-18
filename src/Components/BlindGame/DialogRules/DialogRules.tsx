@@ -50,11 +50,11 @@ const DialogRules: React.FC<DialogRulesProps> = ({ open, onClose, modifyRules, m
                 <option value="Arrêt">Arrêt auto</option>
               </select>
               { modeSelectionne === 'Continu' && <div>
-                    Après x secondes, la réponse est donnée, puis enchaîne automatiquement la musique suivante<br />
+                    Après {tempsEcoute} secondes, la réponse est donnée, puis enchaîne automatiquement la musique suivante<br />
                     Mode de jeu idéal pour une soirée entre amis, nul besoin de rester devant le clavier
               </div> }
               { modeSelectionne === 'Arrêt' && <div>
-                    Après x secondes, La musique s'arrête, vous avez possibilité de demander du temps en plus ou la réponse<br />
+                    Après {tempsEcoute} secondes, La musique s'arrête, vous avez possibilité de demander du temps en plus ou la réponse<br />
                     Mode de jeu idéal si il faut compter les points, avec un temps de réflexion<br />
                     Astuce : les touches espace et entrée permettent respectivement de mettre en pause/play la musique, et de passer à la réponse / musique suivante
               </div> }
