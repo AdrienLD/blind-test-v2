@@ -79,7 +79,7 @@ app.post('/api/research', async (req, res) => {
     
 
   try {
-    const token = req.cookies.token
+    const token = req.cookies.token ?? 'insert token for update-images'
     console.log('research')
     const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
       method: 'GET',

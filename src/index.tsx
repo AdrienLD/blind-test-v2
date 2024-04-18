@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <img className='logo' src='/images/Songs-logo.png' alt="logo" />
-    <div className="version">Version 0.1.01 by <a href="https://github.com/AdrienLD" >@AdrienLD</a></div>
+    <div className="version">Version 0.1.02 by <a href="https://github.com/AdrienLD" >@AdrienLD</a></div>
     <div className="content">
       <Router>
         <Routes>

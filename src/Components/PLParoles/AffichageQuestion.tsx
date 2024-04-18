@@ -15,22 +15,21 @@ export interface setAffichageProps {
 
 function AffichageQuestion ({ musique, affichage, setAffichage, paroles }: AffichageQuestionNPLP) {
     
-  const response = async () => {
-    console.log('response')
-    await setAffichage('Reponse')
-  }
-
-
   return (
-    <div className='VisuelQuestion'>
+    <div className='VisuelQuestion PLP'>
       <img src={musique.albumimg} alt='pochette playlist' className='PochetteAlbum' />
       <div className="infos">
         <p className='TitrePlaylist'>{musique.titre} by {musique.artiste}</p>
         {affichage === 'Question-Loading' && <Chargement />}
-        {affichage === 'Question-Playing' && <>{ paroles }<button onClick={() => setAffichage('Question-Loading')}>Passer</button></>}
+        {affichage === 'Question-Playing' && <>{ paroles }
+          <div className='Question-Answered'>
+            <button onClick={() => setAffichage('Question-Loading')}>Passer</button>
+            <button onClick={() => setAffichage('Reponse')}>Réponse</button>
+          </div>
+        </>}
         {affichage === 'Question-Answered' && <>
           { paroles }
-          <button onClick={response}>Réponse</button>
+          <button onClick={() => setAffichage('Reponse')}>Réponse</button>
         </> }
       </div>
     </div>

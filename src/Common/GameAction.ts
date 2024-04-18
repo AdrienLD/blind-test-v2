@@ -16,6 +16,10 @@ const getAction = async (action: string, method: string) => {
 export const nextmusique = async (receivedData : Musique[], musiqueprecedente: number, modeDebut: string, tempsauDebut: number): Promise<number> => {
   try{
     const musiqueActuelle = musiqueprecedente+1
+    if (musiqueActuelle >= receivedData.length) {
+      console.error('Fin de la playlist.')
+      return -2
+    }
     if (!receivedData[musiqueActuelle]) {
       console.error('Aucune musique suivante trouvée.')
       return -2

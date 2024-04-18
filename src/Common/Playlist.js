@@ -5,7 +5,7 @@
 export const playlist = [
   [ 'Années' , [ '50', '60', '70', '80', '90', '2000', '2010' ] ],
   [ 'Genres' , [ 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde' ] ],
-  [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga' ] ],
+  [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga', 'Taylor Swift', 'Miley Cyrus', 'Indochine', 'Sorano', 'Shakira' ] ],
   [ 'Télévision' , [ 'Films', 'séries tv', 'Séries Dessins Animés', 'Anime Opening', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités' ] ],
   [ 'Français' , [ 'Hits', 'Rock', 'Rap', 'Variétée' ] ]
 ]

@@ -23,6 +23,7 @@ function BlindGame() {
   const [ temps, setTemps ] = React.useState(10)
   const [ modeDebut, setModeDebut ] = React.useState('Selectionner')
   const [ tempsauDebut, setTempsDebut ] = React.useState(0)
+  const [ finPlaylist, setFinPlaylist ] = React.useState(false)
 
   React.useEffect(() => {
     const ciphertext = localStorage.getItem('playlistFinale')
@@ -87,6 +88,8 @@ function BlindGame() {
         const musique = await nextmusique(receivedData, musiqueActuelle, modeDebut, tempsauDebut)
         if (musique === -1) {
           setSpotifyEteint(true)
+        } else if (musique === -2) {
+          setFinPlaylist(true)
         } else {
           setMusiqueActuelle(musique)
           setAffichage('Question-Playing')
@@ -144,6 +147,10 @@ function BlindGame() {
           </div>
           { affichage === 'Chargement' && <div>Chargement...</div> }
         </>
+      }
+
+      {
+        finPlaylist && <div>Fin de la playlist </div>
       }
       
       <DialogRules open={openRules} onClose={() => setOpenRules(false)} modifyRules={Rules} modeInitial={mode} tempsInitial={temps} modeDebutInitial={modeDebut} tempsDebutInitial={tempsauDebut} />

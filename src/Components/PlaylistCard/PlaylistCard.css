@@ -21,9 +21,12 @@
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 22px;
     font-weight: bold;
-    height: 2.3em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;  
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
     text-align: center;
-    margin: 5px 0;
+    margin: 5px;
     overflow: hidden;
 }
 
@@ -31,7 +34,7 @@
 .logoplaylist{
     width: 75%;
     height: 75%;
-    margin: 0 auto 5px auto;
+    margin: 10px auto 0 auto;
     display: block;
     border-radius: 10px;
     object-fit: cover;

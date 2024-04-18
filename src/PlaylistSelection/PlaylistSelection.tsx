@@ -216,7 +216,14 @@ const PlaylistSelection: React.FC = () => {
       </h2>
       { 
         User && <div className='UserInfos' onClick={() => changeAccount()}>
-          <img src={User.images[0]?.url} alt='user' className='UserImage'/>
+          <img src={User.images[0]?.url} 
+            alt='user' 
+            className='UserImage'
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.src = '/images/playlists/trans.png'
+            }}
+          />  
           <div className="UserText">
             <div className='UserName'>{User.display_name}</div>
             <div className="info">Cliquez pour changer d'utilisateur</div>
@@ -263,7 +270,7 @@ const PlaylistSelection: React.FC = () => {
                       className='logoPlaylist'
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
-                        target.src = '/images/trans.png'
+                        target.src = '/images/playlists/trans.png'
                       }}/>                    
                     <div className="nomplaylistselection">
                       {cutString(playlist)}
