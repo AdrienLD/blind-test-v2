@@ -27,7 +27,7 @@ const fetchOptions = (method, body = null) => ({
   credentials: 'include'
 })
 
-const API_URL = 'http://localhost:4000/api'
+const API_URL = '/api'
 
 
 const verifyToken = async (data, action) => {
@@ -214,7 +214,7 @@ export const authentificate = (add) => {
     'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
   ]
 
-  const REDIRECT_URI = 'http://localhost:3000/Auth'
+  const REDIRECT_URI = 'https://songs.flgr.fr/Auth'
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
 
   console.log('CLIENT_ID', CLIENT_ID, `redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`)
