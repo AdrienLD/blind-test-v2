@@ -27,7 +27,7 @@ const fetchOptions = (method, body = null) => ({
   credentials: 'include'
 })
 
-const API_URL = 'http://localhost:4000/api'
+const API_URL = '/api'
 
 
 const verifyToken = async (data, action) => {
@@ -50,8 +50,8 @@ const verifyToken = async (data, action) => {
 
 async function SpotifyToken(action){
   try {
-    console.log('action', action)
     const response = await fetch(`${API_URL}/gettoken`, fetchOptions('POST', { action, code: window.location.search.split('=')[1] }))
+    console.log('response', response)
     const erreur = await verifyToken(response, () => SpotifyToken(action))
     if (erreur) return erreur
     const data = await response.json()
@@ -110,20 +110,6 @@ export async function researchSpotify(playlist, type) {
     const topTenItems = data.playlists.items.slice(0, 10)
     const playlistFound = topTenItems.find(playlist => playlist.owner.uri === 'spotify:user:spotify')
     return playlistFound || data.playlists.items[0]
-  } catch (error) {
-    console.error('Erreur lors de l\'échange du code:', error)
-    throw error
-  }
-}
-
-export async function extractMusiquesSpotify(playlistId, offset) {
-  try {
-    const response = await fetch(`${API_URL}/tracks`, fetchOptions('POST', { playlistId, offset }))
-    const data = await response.json()
-    const erreur = await verifyToken(data, () => extractMusiquesSpotify(playlistId, offset))
-    if (erreur) return erreur
-    console.log('data2', data)
-    return data
   } catch (error) {
     console.error('Erreur lors de l\'échange du code:', error)
     throw error
@@ -202,6 +188,34 @@ export async function getLyricsId(musiqueId) {
   }
 }
 
+export async function replaceThisPlaylist(playlistId) {
+  try {
+    console.log('ceciestplaylistId', playlistId)
+    const response = await fetch(`${API_URL}/replaceplaylist`, fetchOptions('POST', { playlistId }))
+    const erreur = await verifyToken(response, () => replaceThisPlaylist(playlistId))
+    if (erreur) return erreur
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Erreur lors de l\'échange du code:', error)
+    throw error
+  }
+}
+
+export async function nextedMusic(MusicId, positionMs) {
+  try {
+    console.log('ceciestplaylistId', MusicId)
+    const response = await fetch(`${API_URL}/nextmusic`, fetchOptions('POST', { MusicId, positionMs }))
+    const erreur = await verifyToken(response, () => replaceThisPlaylist(MusicId))
+    if (erreur) return erreur
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Erreur lors de l\'échange du code:', error)
+    throw error
+  }
+}
+
 export const authentificate = (add) => {
 
   const spotifyScopes = [
@@ -214,7 +228,7 @@ export const authentificate = (add) => {
     'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
   ]
 
-  const REDIRECT_URI = 'http://localhost:3000/Auth'
+  const REDIRECT_URI = 'https://songs.flgr.fr/Auth'
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
 
   console.log('CLIENT_ID', CLIENT_ID, `redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`)
