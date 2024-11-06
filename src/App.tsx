@@ -13,11 +13,8 @@ function App() {
         Bienvenue dans Songs !
       </h2>
       <div className='description'>
-        <h3>Découvrez Songs : Votre plateforme de jeux musicaux</h3>
-        <p>Plongez dans l'univers de Songs, notre site révolutionnaire conçu spécialement pour les mélomanes et les amateurs de jeux musicaux. Connectez-vous facilement à votre plateforme de musique préférée, actuellement exclusivement sur Spotify, et vivez une expérience où votre passion pour la musique se mêle au divertissement interactif.</p>
-
         <h3>Personnalisez votre expérience musicale</h3>
-        <p>Lancez-vous dans l'aventure Songs en sélectionnant vos playlists préférées déjà disponibles sur Spotify. Découvrez de nouveaux horizons musicaux en ajoutant de nouvelles playlists à votre collection en toute simplicité, enrichissant ainsi votre expérience sur Songs.</p>
+        <p>Lancez-vous dans l'aventure Songs en sélectionnant vos playlists préférées déjà disponibles sur la plateforme de ton choix. Découvrez de nouveaux horizons musicaux en ajoutant de nouvelles playlists à votre collection en toute simplicité, enrichissant ainsi votre expérience sur Songs.</p>
 
         <h3>Modes de jeu captivants sur Songs</h3>
         <p>Songs vous propose deux modes de jeu immersifs pour tester vos connaissances musicales ou pour vous amuser entre amis :</p>
@@ -27,15 +24,17 @@ function App() {
           <li><strong>N'oubliez pas les paroles</strong> : Ce mode est idéal pour les amateurs de chant. Écoutez les paroles d'une chanson qui s'arrêtera brusquement, et tentez de deviner la suite. Un jeu amusant qui mettra à l'épreuve votre mémoire et votre amour pour la musique.</li>
         </ul>
 
-        <p>Songs est l'endroit parfait pour les fans de musique recherchant une expérience ludique unique, mêlant jeu et passion musicale. Que vous soyez à la recherche d'un défi compétitif ou d'une activité divertissante pour animer vos soirées, Songs offre une nouvelle dimension à l'écoute musicale. Connectez-vous, sélectionnez vos playlists, et jouez. La musique vous attend sur Songs !</p>
-
-
         <h3>Commencez dès maintenant ! Connectez vous à votre plateforme préférée : </h3>
         <div className="logosmusique">
           <img src="/images/Spotify.png" alt="Spotify" onClick={() => authentificate('')}/>
-          <img src="/images/Deezer.png" style={{ filter: 'grayscale(70%)' }} alt="Deezer" />
-          <img src="/images/AppleMusic.png" style={{ filter: 'grayscale(70%)' }} alt="AppleMusic" />
+          <img src="/images/Deezer.png" style={{ filter: 'grayscale(100%)' }} alt="Deezer" />
+          <img src="/images/AppleMusic.png" style={{ filter: 'grayscale(100%)' }} alt="AppleMusic" />
         </div>
+
+        <h3>Alerte</h3>
+        <p>Actuellement, Songs est uniquement compatible avec Spotify. <br/>
+        L'API de Spotify étant en mode développeur, l'application ne peut pas être rendue publique. <br/>
+        Chaque compte doit être autorisé au préalable. Pour cela, veuillez contacter le créateur avec l'adresse email associée à votre compte Spotify afin qu'il puisse vous donner accès à l'API.</p>
       </div>
 
     </div>
