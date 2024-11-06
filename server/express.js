@@ -8,7 +8,7 @@ import { URLSearchParams } from 'url'
 const app = express()
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:4000',
   credentials: true
 }
 dotenv.config()
@@ -21,12 +21,11 @@ const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 app.post('/api/gettoken', async (req, res) => {
-  console.log('gettoken', CLIENT_ID, CLIENT_SECRET)
   const action = req.body.action
   const code = action === 'gettoken' ? req.body.code : req.cookies.refresh_token
   const params = new URLSearchParams()
   params.append('grant_type', action === 'gettoken' ? 'authorization_code' : 'refresh_token')
-  action === 'gettoken' ? params.append('redirect_uri', 'http://localhost:3000/Auth') : null
+  action === 'gettoken' ? params.append('redirect_uri', 'https://songs.flgr.fr/Auth') : null
   params.append(action === 'gettoken' ? 'code' : 'refresh_token' , code)
   const headers = {
     'Authorization': 'Basic ' + Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'),
@@ -34,7 +33,6 @@ app.post('/api/gettoken', async (req, res) => {
   }
 
   try {
-    console.log('params', params , headers)
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       body: params,
@@ -42,7 +40,6 @@ app.post('/api/gettoken', async (req, res) => {
       credentials: 'include'
     })
     const data = await response.json()    
-    console.log('data', data) 
     if (data.access_token) res.cookie('token', data.access_token, { httpOnly: true })
     if (data.refresh_token) res.cookie('refresh_token', data.refresh_token, { httpOnly: true })
     res.send(data)
@@ -57,14 +54,12 @@ app.post('/api/gettoken', async (req, res) => {
 app.get('/api/testtoken', async (req, res) => {
   try {
     const token = req.cookies.token
-    console.log('test')
     const response = await fetch('https://api.spotify.com/v1/me/player', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
       }
     })
-    console.log(response.status)
     if (response.status === 204) return res.json({ error: { status: 401 } })
     return res.json(await response.json())
   } catch (error) {
@@ -80,7 +75,6 @@ app.post('/api/research', async (req, res) => {
 
   try {
     const token = req.cookies.token ?? 'insert token for update-images'
-    console.log('research')
     const response = await nodeFetch(`https://api.spotify.com/v1/search?q=${titre}&type=${type}`, {
       method: 'GET',
       headers: {
@@ -99,7 +93,6 @@ app.post('/api/tracks', async (req, res) => {
   const { playlistId, offset } = req.body
   try {
     const token = req.cookies.token
-    console.log('tracks')
     const response = await nodeFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${offset}`, {
       method: 'GET',
       headers: {
@@ -117,7 +110,6 @@ app.post('/api/tracks', async (req, res) => {
 app.get('/api/getplayerstate', async (req, res) => {
   try {
     const token = req.cookies.token
-    console.log('getplayerstate', token)
     const response = await fetch('https://api.spotify.com/v1/me', {
       method: 'GET',
       headers: {
@@ -143,7 +135,6 @@ app.get('/api/playpause', async (req, res) => {
   const method = req.headers.method
   try {
     const token = req.cookies.token
-    console.log('playpause')
     const response = await fetch(`https://api.spotify.com/v1/me/player/${commande}`, {
       method: method,
       headers: {
@@ -155,7 +146,6 @@ app.get('/api/playpause', async (req, res) => {
       const data = await response.json()
       res.json(data)
     } else {
-      console.log('Réponse réussie sans corps de contenu.')
       res.status(response.status).send('Réponse sans contenu')
     }
   } catch (error) {
@@ -176,7 +166,6 @@ app.get('/api/getlyricsId', async (req, res) => {
       }
     })
     const data2 = await token.json()
-    console.log('getlyricsId', data2.accessToken)
     const response = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${titreId}`, {
       method: 'GET',
       headers: {
@@ -197,7 +186,6 @@ app.post('/api/newplaylist', async (req, res) => {
   const { playlistId } = req.body
   try {
     const token = req.cookies.token
-    console.log('newPlaylist')
     const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
       method: 'GET',
       headers: {
@@ -216,3 +204,4 @@ app.post('/api/newplaylist', async (req, res) => {
 app.listen(4000, () => {
   console.log('Serveur démarré (port 4000)')
 })
+

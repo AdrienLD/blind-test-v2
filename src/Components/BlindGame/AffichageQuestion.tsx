@@ -20,7 +20,7 @@ function AffichageQuestion ({ musique, affichage, setAffichage, temps }: Afficha
     <div className='VisuelQuestion'>
       <img src={musique.playlistimg} alt='pochette playlist' className='PochetteAlbum' />
       <div className="infos">
-        <p className='TitrePlaylist'>Playlist : {musique.playlist.split(' £ ')[1]}</p>
+        <p className='TitrePlaylist'>Playlist : {musique.playlist}</p>
         {affichage === 'Question-Loading' && <Chargement />}
         {affichage === 'Question-Playing' && <>
           <Countdown duration={temps*1000} onFinish={() => setAffichage('Question-Answered')}/>
