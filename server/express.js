@@ -166,7 +166,7 @@ app.get('/api/getlyricsId', async (req, res) => {
       }
     })
     const data2 = await token.json()
-    const response = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${titreId}`, {
+    const response = await fetch(`https://api.lyricstify.vercel.app/v1/lyrics/${titreId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${data2.accessToken}`,
