@@ -216,6 +216,19 @@ export async function nextedMusic(MusicId, positionMs) {
   }
 }
 
+export async function getSyncLyrics(artist, title) {
+  try {
+    const response = await fetch(`${API_URL}/searchmusic`, fetchOptions('POST', { artist, title }))
+    const data = await response.json()
+    console.log('getSyncLyrics', data)
+    return data
+  } catch (error) {
+    console.error('Erreur lors de la recherche des paroles synchronisées:', error)
+    throw error
+  }
+}
+
+
 export const authentificate = (add) => {
 
   const spotifyScopes = [
