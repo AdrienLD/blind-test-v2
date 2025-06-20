@@ -2,7 +2,7 @@ import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './PLParoles.sass'
 import { decryptPlaylist } from '../BlindGame/SpotifyAPI'
-import { getLyricsId, getSpotifyAction } from '../../Common/Playlist'
+import { getLyricsId, getSpotifyAction, getSyncLyrics } from '../../Common/Playlist'
 import { nextmusique } from '../../Common/GameAction'
 import { cancelableSleep, sleep } from '../BlindGame/utils'
 import AffichageQuestion from './AffichageQuestion'
@@ -130,7 +130,7 @@ function PLParoles() {
   }, [ affichagesuivant, affichage ])
 
   const getRandomStartTime = async (musique: number) => {
-    let paroles = await getLyricsId(receivedData[musique].id)
+    let paroles = await getSyncLyrics(receivedData[musique].artiste, receivedData[musique].titre)
     console.log('paroles', paroles, paroles === 'Lyrics non trouvés')
     while (paroles === 'Lyrics non trouvés') {
       sleep(1000)
