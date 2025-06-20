@@ -129,8 +129,29 @@ function PLParoles() {
     if (affichage === 'Question-Playing' || affichage=== 'Reponse') updateLyrics()
   }, [ affichagesuivant, affichage ])
 
+
+  function parseLyrics(rawText: string) {
+    const lines = rawText.split('\n')
+    const parsed = []
+
+    for (const line of lines) {
+      const match = line.match(/^\[(\d+):(\d+\.\d+)\](.*)$/)
+      if (match) {
+        const minutes = parseInt(match[1], 10)
+        const seconds = parseFloat(match[2])
+        const text = match[3].trim()
+        const time = minutes * 60 + seconds
+        parsed.push({ time, text })
+      }
+    }
+
+    return parsed
+  }
+
+
   const getRandomStartTime = async (musique: number) => {
     let paroles = await getSyncLyrics(receivedData[musique].artiste, receivedData[musique].titre)
+    paroles = parseLyrics(paroles.synced_lyrics)
     console.log('paroles', paroles, paroles === 'Lyrics non trouvés')
     while (paroles === 'Lyrics non trouvés') {
       sleep(1000)
