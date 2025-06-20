@@ -31,6 +31,7 @@ const DialogNewPlaylist: React.FC<DialogNewPlaylistProps> = ({ open, onClose, ad
       activateAlert('Aucune playlist entrée')
     } else if (playlistId.length === 22) {
       const playlistinfos =  await searchNewSpotifyPlaylist(playlistId)
+      console.log('Adrien' , playlistinfos)
       if (userPlaylistInfos[0].find(playlist => playlist[0] === playlistinfos.name)) {
         activateAlert('Playlist du même nom déjà ajoutée')
       } else if (playlistinfos.error === undefined){

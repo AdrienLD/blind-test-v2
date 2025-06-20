@@ -35,6 +35,8 @@ function CallBack() {
   }
 
   */
+
+  
   const extractmusique = async () => {
     await console.log('extractmusique')
     const playlistfromlocalStorage = localStorage.getItem('playlists')
@@ -62,7 +64,6 @@ function CallBack() {
 
     const test = await replaceThisPlaylist(playlistSelection)
     
-    console.log('test', test)
     test.results.forEach((element: { 
       duration_ms: any
       name: any
@@ -88,6 +89,15 @@ function CallBack() {
     await localStorage.setItem('playlistFinale', ciphertext)
     await localStorage.setItem('CurrentMusic', '0')
     const mode = localStorage.getItem('mode')
+    const titresArtistes = test.results.map((e: { name: any, artists: any[] }) => ({
+      titre: e.name,
+      artiste: e.artists.map(a => a.name).join(', ')
+    }))
+    const playlistLimitée = [ ...titresArtistes ]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 20)
+  
+    console.log('Adrien', playlistLimitée) 
     navigate(mode === 'blind' ? '/BlindGame' : '/PLParoles')
   }
 

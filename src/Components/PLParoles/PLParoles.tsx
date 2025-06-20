@@ -2,41 +2,87 @@ import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './PLParoles.sass'
 import { decryptPlaylist } from '../BlindGame/SpotifyAPI'
-import { getLyricsId, getSpotifyAction, getSyncLyrics } from '../../Common/Playlist'
-import { nextmusique } from '../../Common/GameAction'
-import { cancelableSleep, sleep } from '../BlindGame/utils'
+import { getSpotifyAction } from '../../Common/Playlist'
+import { getNextMusiqueWLyrics, Lyrics, MusicWLyrics, nextmusiqueNPLP } from '../../Common/GameAction'
+import { cancelableSleep } from '../BlindGame/utils'
 import AffichageQuestion from './AffichageQuestion'
 import AffichageReponse from './AffichageReponse'
 import { useNavigate } from 'react-router-dom'
 
+export type AffichageState =
+  | 'Question-Loading'
+  | 'Question-Playing'
+  | 'Question-Answered'
+  | 'Question-Reponse'
+  | 'Question-Chargement'
+
+export const QUESTION_LOADING: AffichageState   = 'Question-Loading'
+export const QUESTION_PLAYING: AffichageState   = 'Question-Playing'
+export const QUESTION_ANSWERED: AffichageState  = 'Question-Answered'
+export const QUESTION_REPONSE: AffichageState   = 'Question-Reponse'
+export const QUESTION_CHARGEMENT: AffichageState   = 'Question-Chargement'
+
+export type SetAffichage = React.Dispatch<React.SetStateAction<AffichageState>>
+
+export function parseLyrics(lrc: string): Lyrics[] {
+  const lines = lrc.split('\n')
+  const result: Lyrics[] = []
+
+  for (const line of lines) {
+    const match = line.match(/^\[(\d{2}):(\d{2})\.(\d{2})\]\s*(.*)$/)
+    if (match) {
+      const minutes = parseInt(match[1], 10)
+      const seconds = parseInt(match[2], 10)
+      const centiseconds = parseInt(match[3], 10)
+      const text = match[4].trim()
+
+      const totalMilliseconds = (minutes * 60 + seconds) * 1000 + centiseconds * 10
+
+      result.push({
+        startTimeMs: totalMilliseconds,
+        words: text
+      })
+    }
+  }
+
+  return result
+}
+
+const transformString = (input: string | undefined | null) =>
+  (input ?? '').split('').map(char =>
+    char === ' ' ? ' ' : /[^\s\WêôÔçàéè]/.test(char) ? '_' : char
+  ).join('')
+
+
 function PLParoles() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
-  const [ parolesActuelles, setParolesActuelles ] = React.useState<Array<{ startTimeMs: string, words: string }>>([])
-  const [ affichage, setAffichage ] = React.useState('Chargement')
+  const [ parolesActuelles, setParolesActuelles ] = React.useState<Lyrics[]>([])
+  const [ affichage, setAffichage ] = React.useState<AffichageState>(QUESTION_CHARGEMENT)
   const [ receivedData, setReceivedData ] = React.useState<Musique[]>([])
   const [ position, setPosition ] = React.useState(0)
   const [ lyricsJSX, setLyricsJSX ] = React.useState<React.ReactElement | null>(null)
-  const [ affichageprecedent, setAffichageprecedent ] = React.useState(4)
   const [ affichagesuivant, setAffichagesuivant ] = React.useState(4)
   const [ spotifyEteint, setSpotifyEteint ] = React.useState(false)
+  const nextMusiquePromiseRef = React.useRef<Promise<MusicWLyrics> | null>(null)
+  const nextMusiqueRef = React.useRef<MusicWLyrics | null>(null)
 
-  const [ controller, setController ] = React.useState(new AbortController())
+  const controllerRef = React.useRef(new AbortController())
 
   const navigate = useNavigate()
     
-  const getAction = async (action: string, method: string) => {
+  const getAction = React.useCallback(async (action: string, method: string) => {
     const response = await getSpotifyAction(action, method)
     if (!response) return
     if (response.status === 404) {
       setSpotifyEteint(true)
     }
     return response
-  }
+  }, [])
 
   
   React.useEffect(() => {
     if (receivedData.length > 0) {
-      setAffichage('Question-Loading')
+      setAffichage(QUESTION_LOADING)
     }
   } , [ receivedData ])
 
@@ -58,150 +104,130 @@ function PLParoles() {
     }
   }, [])
 
-  function transformString(input: string) {
-    if (!input) return ''
-    return input.split('').map(char => {
-      if (char === ' ') {
-        return ' '
-      } else if (char.match(/[a-zA-Zéïèàùç0-9]/)) {
-        return '_'
-      } else {
-        return char
-      }
-    }).join('')
+  const renderLine = (relativeIndex: number): React.ReactElement => {
+    const index = position + relativeIndex
+    const lyric = parolesActuelles[index]
+    const words = lyric?.words ?? '   '
+
+    const isPrimary = relativeIndex === 0
+    const shouldTransform = (
+      (isPrimary && affichagesuivant === -1)
+    || (!isPrimary && affichagesuivant === relativeIndex - 1)
+    )
+
+    let displayText = shouldTransform ? transformString(words) : words
+
+    if (affichagesuivant+1 < relativeIndex) {
+      displayText = ''
+    }
+
+    return (
+      <div className={isPrimary ? 'primaires' : 'secondaires'} key={relativeIndex}>
+        {displayText}
+      </div>
+    )
   }
 
   React.useEffect(( ) => {
     const updateLyrics = async () => {
-      controller.abort()
-      const newController = new AbortController()
-      setController(newController)
-      const currLyric = parolesActuelles[position] ?? { startTimeMs: '0', words: '' }
-      const nextLyric = parolesActuelles[position + 1] ?? { startTimeMs: '0', words: '' }
+      
+      controllerRef.current.abort()
+      controllerRef.current = new AbortController()
+      const signal = controllerRef.current.signal
+
+      const currLyric = parolesActuelles[position] ?? { startTimeMs: 0, words: '' }
+      const nextLyric = parolesActuelles[position + 1] ?? currLyric
+
+      if (signal.aborted) return
       setLyricsJSX(
         <div className='paroles'>
-          <div className="secondaires">
-            {parolesActuelles[position - 3]?.words ?? '   '}
-
-          </div>
-          <div className="secondaires">
-            {parolesActuelles[position - 2]?.words ?? '   '}
-
-          </div>
-          <div className="secondaires">
-            {parolesActuelles[position - 1] ? parolesActuelles[position - 1].words : '   '}
-
-          </div>
-          <div className="primaires">
-            {affichagesuivant === -1 ? transformString(parolesActuelles[position]?.words) : parolesActuelles[position]?.words}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 0 ? affichagesuivant === 0 ? transformString(parolesActuelles[position + 1]?.words) : parolesActuelles[position + 1]?.words : '   '}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 1 ? affichagesuivant === 1 ? transformString(parolesActuelles[position + 2]?.words) : parolesActuelles[position + 2]?.words : '   '}
-          </div>
-          <div className="secondaires">
-            {affichagesuivant >= 2 ? affichagesuivant === 2 ? transformString(parolesActuelles[position + 3]?.words) : parolesActuelles[position + 3]?.words : '   '}
-          </div>
+          {[ -3, -2, -1, 0, 1, 2, 3 ].map(i => renderLine(i))}
         </div>
       )
-      if (affichagesuivant === 0 && affichage === 'Question-Playing') {
-        const result = await cancelableSleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs) - 100, newController.signal )
-        if (result.ok){
-          setAffichagesuivant(affichagesuivant - 1)
-          setPosition(position + 1)
-          getAction('pause', 'PUT')
-        }
-      } else if (affichagesuivant > 0) {
-        const result = await cancelableSleep(parseInt(nextLyric.startTimeMs) - parseInt(currLyric.startTimeMs), newController.signal )
-        if (result.ok){
-          setAffichagesuivant(affichagesuivant - 1)
-          setPosition(position + 1)
-        }
-      } else if (affichage !== 'Reponse')setAffichage('Question-Answered')
-      else if (currLyric.words === '') {
-        const result = await cancelableSleep(receivedData[musiqueActuelle].duration - parseInt(parolesActuelles[parolesActuelles.length - 1].startTimeMs), newController.signal)
-        if (result.ok) setAffichage('Question-Loading')
-      }
-      
+
+      const delay = nextLyric.startTimeMs - currLyric.startTimeMs - (affichagesuivant === 0 ? 200 : 0)
+      if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE){
+        await cancelableSleep(delay, signal)
+        if (signal.aborted) return
+
+        setAffichagesuivant(n => n - 1)
+        setPosition(p => p + 1)
+      } 
     }
-    if (affichage === 'Question-Playing' || affichage=== 'Reponse') updateLyrics()
+    if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE) updateLyrics()
+      
+    return () => controllerRef.current.abort()
   }, [ affichagesuivant, affichage ])
 
-
-  function parseLyrics(rawText: string) {
-    const lines = rawText.split('\n')
-    const parsed = []
-
-    for (const line of lines) {
-      const match = line.match(/^\[(\d+):(\d+\.\d+)\](.*)$/)
-      if (match) {
-        const minutes = parseInt(match[1], 10)
-        const seconds = parseFloat(match[2])
-        const text = match[3].trim()
-        const time = minutes * 60 + seconds
-        parsed.push({ time, text })
-      }
+  React.useEffect(() => {
+    if (affichage !== QUESTION_PLAYING || affichagesuivant !== -1) {
+      return
     }
+    let cancelled = false
+  ;(async () => {
+      await getAction('pause', 'PUT')
+      if (cancelled) return
 
-    return parsed
+      setAffichagesuivant(-1)
+
+      setAffichage(QUESTION_ANSWERED)
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [ affichagesuivant, affichage, getAction ])
+
+  const getRandomStartTime = (musique: MusicWLyrics ) => {
+    const maxStart = Math.max(0, musique.lyrics.length - 6)
+    return Math.floor(Math.random() * (maxStart + 1))
   }
 
-
-  const getRandomStartTime = async (musique: number) => {
-    let paroles = await getSyncLyrics(receivedData[musique].artiste, receivedData[musique].titre)
-    paroles = parseLyrics(paroles.synced_lyrics)
-    console.log('paroles', paroles, paroles === 'Lyrics non trouvés')
-    while (paroles === 'Lyrics non trouvés') {
-      sleep(1000)
-      musique++
-      paroles = await getLyricsId(receivedData[musique].id)
-      console.log('paroles', paroles, paroles === 'Lyrics non trouvés', receivedData[musique].id)
-    }
-    if (paroles.length > 0) {
-      let randomIndex = Math.floor(Math.random() * (paroles.length - 5))
-      let randandaffichage = randomIndex + affichageprecedent
-      console.log('paroles dans rand', paroles[randandaffichage + 1])
-      while (paroles[randandaffichage + 1].words === '♪' || paroles[randandaffichage + 1].words === '' || paroles[randandaffichage + 1].words === paroles[randandaffichage].words) {
-        randomIndex = Math.floor(Math.random() * (paroles.length - 5))
-        randandaffichage = randomIndex + affichageprecedent
-      }
-      const timer = parseInt(paroles[randomIndex].startTimeMs)
-      getAction('seek?position_ms=' + timer, 'PUT')
-      setPosition(randomIndex)
-      setParolesActuelles(paroles)
-      setAffichageprecedent(4)
-    } else { setAffichage('Question-Loading') }
-  }
 
   React.useEffect(() => {
     const executeAsyncOperation = async () => {
-      if (affichage === 'Question-Loading') {
-        console.log('musiqueActuelle', musiqueActuelle, affichagesuivant) 
+      if (affichage === QUESTION_LOADING) {
         setAffichagesuivant(-1)
-        const musique = await nextmusique(receivedData, musiqueActuelle, 'Selectionner', 0)
-        
+
+        if (nextMusiqueRef.current === null) {
+          nextMusiquePromiseRef.current = getNextMusiqueWLyrics(receivedData, musiqueActuelle)
+        }
+        const nextMusique = await nextMusiquePromiseRef.current!
+        nextMusiqueRef.current = nextMusique
+        nextMusiquePromiseRef.current = null
+        const startLine = getRandomStartTime(nextMusique)
+        const musique = await nextmusiqueNPLP(nextMusique, nextMusique.lyrics[startLine].startTimeMs)
         if (musique === -1) {
           setSpotifyEteint(true)
         } else {
-          console.log('musique', affichagesuivant)
-          setMusiqueActuelle(musique)
-          await getRandomStartTime(musique)
-          await setAffichagesuivant(4)
-          setAffichage('Question-Playing')
+          localStorage.setItem('CurrentMusic', nextMusique.musicActualPosition.toString())
+          setParolesActuelles(nextMusique.lyrics)
+          setPosition(startLine)
+          setMusiqueActuelle(nextMusique.musicActualPosition)
+          setAffichagesuivant(4)
+          setAffichage(QUESTION_PLAYING)
         }
       
-      } else if (affichage === 'Reponse') {
+      } else if (affichage === QUESTION_REPONSE) {
         setAffichagesuivant(parolesActuelles.length - position)
         getAction('seek?position_ms=' + parolesActuelles[position].startTimeMs, 'PUT')
         getAction('play', 'PUT')
+      } else if (affichage === QUESTION_PLAYING) {
+        searchNextMusic()
       }
+
     }
     executeAsyncOperation()
   }, [ affichage ])
 
+  function searchNextMusic() {
+    if (!nextMusiquePromiseRef.current) {
+      nextMusiquePromiseRef.current = getNextMusiqueWLyrics(receivedData, musiqueActuelle)
+    }
+  }
   
+
+
 
 
   return (
@@ -211,8 +237,8 @@ function PLParoles() {
           <button onClick={() => navigate('/ChoosePlaylist')}>Retour sélection</button>
         </div>
         <div className="content">
-          { affichage.includes('Question') && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} /> }
-          { affichage.includes('Reponse') && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX} /> }
+          { (affichage !== QUESTION_REPONSE && affichage !== QUESTION_CHARGEMENT) && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} /> }
+          { affichage === QUESTION_REPONSE && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX} /> }
         </div> </>
       }
     </div>

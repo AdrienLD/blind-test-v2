@@ -1,10 +1,10 @@
 import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
-import { setAffichageProps } from './AffichageQuestion'
+import { QUESTION_LOADING, SetAffichage } from './PLParoles'
 
 interface AffichageReponseNPLP {
   musique: Musique
-  setAffichage: setAffichageProps
+  setAffichage: SetAffichage
   paroles: React.ReactElement | null
 }
 
@@ -16,7 +16,7 @@ function AffichageReponse ({ musique, setAffichage, paroles }: AffichageReponseN
         <p className='TitrePlaylist'>{musique.titre} by {musique.artiste}</p>
         {paroles}
         <div className='Response'>
-          <button onClick={() =>setAffichage('Question-Loading')}>Musique suivante</button>
+          <button onClick={() =>setAffichage(QUESTION_LOADING)}>Musique suivante</button>
         </div>
       </div>
     </div>
