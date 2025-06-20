@@ -133,7 +133,7 @@ function PLParoles() {
   function parseLyrics(rawText: string) {
     const lines = rawText.split('\n')
     const parsed = []
-
+    console.log('rawText', lines, rawText)
     for (const line of lines) {
       const match = line.match(/^\[(\d+):(\d+\.\d+)\](.*)$/)
       if (match) {
@@ -150,9 +150,21 @@ function PLParoles() {
 
 
   const getRandomStartTime = async (musique: number) => {
+    console.log('befoerGetLyrics', musique, receivedData[musique],receivedData[musique].artiste, receivedData[musique].titre)
+    try {
+      let paroles = await getSyncLyrics(receivedData[musique].artiste, receivedData[musique].titre)
+      console.log('paroles before parse', paroles)
+      paroles = parseLyrics(paroles)
+      console.log('paroles after parse', paroles, paroles === 'Lyrics non trouvés')
+    } catch (error) {
+      console.error('Error fetching lyrics:', error)
+      setAffichage('Question-Loading')
+      return
+    }
     let paroles = await getSyncLyrics(receivedData[musique].artiste, receivedData[musique].titre)
-    paroles = parseLyrics(paroles.synced_lyrics)
-    console.log('paroles', paroles, paroles === 'Lyrics non trouvés')
+    console.log('paroles before parse', paroles)
+    paroles = parseLyrics(paroles)
+    console.log('paroles after parse', paroles, paroles === 'Lyrics non trouvés')
     while (paroles === 'Lyrics non trouvés') {
       sleep(1000)
       musique++

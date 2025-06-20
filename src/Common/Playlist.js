@@ -219,9 +219,10 @@ export async function nextedMusic(MusicId, positionMs) {
 export async function getSyncLyrics(artist, title) {
   try {
     const response = await fetch(`${API_URL}/searchmusic`, fetchOptions('POST', { artist, title }))
+    console.log('STATUS', response.status)
     const data = await response.json()
-    console.log('getSyncLyrics', data)
-    return data
+    console.log('getSyncLyrics', data.synced_lyrics)
+    return data.synced_lyrics
   } catch (error) {
     console.error('Erreur lors de la recherche des paroles synchronisées:', error)
     throw error
