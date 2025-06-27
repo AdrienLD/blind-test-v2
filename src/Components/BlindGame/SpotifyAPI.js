@@ -1,4 +1,4 @@
-import { getSpotifyAction, secretKey } from '../../Common/Playlist.js'
+import { getSpotifyAction, secretKey } from '../../server/Playlist.js'
 import CryptoJS from 'crypto-js'
 
 export const decryptPlaylist = (ciphertext) => {

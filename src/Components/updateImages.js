@@ -1,4 +1,4 @@
-import { playlist, researchSpotify } from '../Common/Playlist.js'
+import { playlist, researchSpotify } from '../server/Playlist.js'
 import fs from 'fs'
 import https from 'https'
 import path from 'path'

@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "spotify.d.ts"  ]
+, "spotify.d.ts", "src/server/Playlist.js"  ]
 }

@@ -3,7 +3,7 @@ import PlaylistCard from '../Components/PlaylistCard/PlaylistCard'
 import './PlaylistSelection.sass'
 import ListPlaylistCard, { ListPlaylistCardProps } from '../Components/PlaylistCard/ListPlaylistCard/ListPlaylistCard'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { authentificate, getUserInfos, playlist, secretKey } from '../Common/Playlist'
+import { authentificate, getUserInfos, playlist, secretKey } from '../server/Playlist'
 import CryptoJS from 'crypto-js'
 
 import Alert from '@mui/material/Alert'
@@ -285,6 +285,7 @@ const PlaylistSelection: React.FC = () => {
               }
             </div>
             <div className="Validations">
+              <button onClick={() => extractmusique('test')}>Tester la BDD </button>
               <button onClick={() => exportmusique()}>Exporter</button>
               <button onClick={onImportClick}>Importer</button>
               <input 

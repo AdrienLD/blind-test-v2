@@ -5,10 +5,13 @@
 export const playlist = [
   [ 'Années' , [ '50', '60', '70', '80', '90', '2000', '2010' ] ],
   [ 'Genres' , [ 'Rock', 'Pop', 'Rap', 'RnB', 'Classique', 'Jazz', 'Monde' ] ],
-  [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga', 'Taylor Swift', 'Miley Cyrus', 'Indochine', 'Sorano', 'Shakira' ] ],
+  [ 'Artistes' , [ 'Imagine Dragons', 'Steel Panther', 'Ghost', 'Lady Gaga', 'Taylor Swift', 'Miley Cyrus', 'Indochine', 'Soprano', 'Shakira' ] ],
   [ 'Télévision' , [ 'Films', 'séries tv', 'Séries Dessins Animés', 'Anime Opening', 'Disney', "Films d'animation", 'Jeux Vidéos', 'Publicités' ] ],
   [ 'Français' , [ 'Hits', 'Rock', 'Rap', 'Variétée' ] ]
 ]
+
+const API_URL = process.env.REACT_APP_API_URL 
+const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI
 
 export const playlistUtilisateur = [
   []
@@ -26,8 +29,6 @@ const fetchOptions = (method, body = null) => ({
   body: body ? JSON.stringify(body) : null,
   credentials: 'include'
 })
-
-const API_URL = '/api'
 
 
 const verifyToken = async (data, action) => {
@@ -219,15 +220,26 @@ export async function nextedMusic(MusicId, positionMs) {
 export async function getSyncLyrics(artist, title) {
   try {
     const response = await fetch(`${API_URL}/searchmusic`, fetchOptions('POST', { artist, title }))
+    console.log('STATUS', response.status)
     const data = await response.json()
-    console.log('getSyncLyrics', data)
-    return data
+    return data.synced_lyrics
   } catch (error) {
     console.error('Erreur lors de la recherche des paroles synchronisées:', error)
     throw error
   }
 }
 
+export async function testBDD(playlist) {
+  try {
+    const response = await fetch(`${API_URL}/testBDD`, fetchOptions('POST', { playlist }))
+    console.log('STATUS', response.status)
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Erreur lors de la recherche des paroles synchronisées:', error)
+    throw error
+  }
+}
 
 export const authentificate = (add) => {
 
@@ -241,7 +253,6 @@ export const authentificate = (add) => {
     'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
   ]
 
-  const REDIRECT_URI = 'https://songs.flgr.fr/Auth'
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
 
   console.log('CLIENT_ID', CLIENT_ID, `redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`)

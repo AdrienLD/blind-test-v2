@@ -2,13 +2,13 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import './BlindGame.sass'
-import { getSpotifyAction } from '../../Common/Playlist'
+import { getSpotifyAction } from '../../server/Playlist'
 import { decryptPlaylist } from './SpotifyAPI'
 import AffichageReponse from './AffichageReponse'
 import AffichageQuestion from './AffichageQuestion'
 import { sleep } from './utils'
 import DialogRules, { RulesParams } from './DialogRules/DialogRules'
-import { nextmusique } from '../../Common/GameAction'
+import { nextmusiqueBT } from '../../Common/GameAction'
 
 function BlindGame() {
   const [ musiqueActuelle, setMusiqueActuelle ] = React.useState(0)
@@ -82,7 +82,7 @@ function BlindGame() {
   
     const executeAsyncOperation = async () => {
       if (affichage === 'Question-Loading') {
-        const musique = await nextmusique(receivedData, musiqueActuelle, modeDebut, tempsauDebut)
+        const musique = await nextmusiqueBT(receivedData, musiqueActuelle, modeDebut, tempsauDebut)
         if (musique === -1) {
           setSpotifyEteint(true)
         } else if (musique === -2) {
@@ -98,7 +98,7 @@ function BlindGame() {
       }
     }
     executeAsyncOperation()
-  }, [ affichage, nextmusique, receivedData, musiqueActuelle, modeDebut, tempsauDebut, Answered ])
+  }, [ affichage, nextmusiqueBT, receivedData, musiqueActuelle, modeDebut, tempsauDebut, Answered ])
   
 
   

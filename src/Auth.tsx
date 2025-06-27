@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getSpotifyToken } from './Common/Playlist'
+import { getSpotifyToken } from './server/Playlist'
 
 function Auth() {
   

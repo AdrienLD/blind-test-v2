@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogContentText } from '@mui/material'
 import './DialogNewPlaylist.sass'
-import { searchNewSpotifyPlaylist } from '../../../Common/Playlist'
+import { searchNewSpotifyPlaylist } from '../../../server/Playlist'
 
 interface DialogNewPlaylistProps {
   open: boolean
@@ -31,6 +31,7 @@ const DialogNewPlaylist: React.FC<DialogNewPlaylistProps> = ({ open, onClose, ad
       activateAlert('Aucune playlist entrée')
     } else if (playlistId.length === 22) {
       const playlistinfos =  await searchNewSpotifyPlaylist(playlistId)
+      console.log('Adrien' , playlistinfos)
       if (userPlaylistInfos[0].find(playlist => playlist[0] === playlistinfos.name)) {
         activateAlert('Playlist du même nom déjà ajoutée')
       } else if (playlistinfos.error === undefined){

@@ -1,16 +1,13 @@
 import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import Chargement from '../../Common/Chargement/Chargement'
+import { AffichageState, QUESTION_ANSWERED, QUESTION_LOADING, QUESTION_PLAYING, QUESTION_REPONSE, SetAffichage } from './PLParoles'
 
 interface AffichageQuestionNPLP {
   musique: Musique
-  affichage: string
-  setAffichage: setAffichageProps
+  affichage: AffichageState
+  setAffichage: SetAffichage
   paroles: React.ReactElement | null
-}
-
-export interface setAffichageProps {
-  (value: string): void
 }
 
 function AffichageQuestion ({ musique, affichage, setAffichage, paroles }: AffichageQuestionNPLP) {
@@ -20,16 +17,16 @@ function AffichageQuestion ({ musique, affichage, setAffichage, paroles }: Affic
       <img src={musique.albumimg} alt='pochette playlist' className='PochetteAlbum' />
       <div className="infos">
         <p className='TitrePlaylist'>{musique.titre} by {musique.artiste}</p>
-        {affichage === 'Question-Loading' && <Chargement />}
-        {affichage === 'Question-Playing' && <>{ paroles }
+        {affichage === QUESTION_LOADING && <Chargement />}
+        {affichage === QUESTION_PLAYING && <>{ paroles }
           <div className='Question-Answered'>
-            <button onClick={() => setAffichage('Question-Loading')}>Passer</button>
-            <button onClick={() => setAffichage('Reponse')}>Réponse</button>
+            <button onClick={() => setAffichage(QUESTION_LOADING)}>Passer</button>
+            <button onClick={() => setAffichage(QUESTION_REPONSE)}>Réponse</button>
           </div>
         </>}
-        {affichage === 'Question-Answered' && <>
+        {affichage === QUESTION_ANSWERED && <>
           { paroles }
-          <button onClick={() => setAffichage('Reponse')}>Réponse</button>
+          <button onClick={() => setAffichage(QUESTION_REPONSE)}>Réponse</button>
         </> }
       </div>
     </div>
