@@ -1,7 +1,7 @@
 import React from 'react'
 import { Musique } from '../../PlaylistSelection/PlaylistSelection'
 import Chargement from '../../Common/Chargement/Chargement'
-import { AffichageState, QUESTION_ANSWERED, QUESTION_LOADING, QUESTION_PLAYING, QUESTION_REPONSE, SetAffichage } from './PLParoles'
+import { AffichageState, QUESTION_ANSWERED, QUESTION_LOADING, QUESTION_PLAYING, QUESTION_REPONSE, SetAffichage, QUESTION_REPONSE_SIMPLE } from './PLParoles'
 
 interface AffichageQuestionNPLP {
   musique: Musique
@@ -27,6 +27,8 @@ function AffichageQuestion ({ musique, affichage, setAffichage, paroles }: Affic
         {affichage === QUESTION_ANSWERED && <>
           { paroles }
           <button onClick={() => setAffichage(QUESTION_REPONSE)}>Réponse</button>
+          <button onClick={() => setAffichage(QUESTION_REPONSE_SIMPLE)}>Afficher juste la réponse</button>
+
         </> }
       </div>
     </div>
