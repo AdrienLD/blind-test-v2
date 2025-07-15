@@ -64,3 +64,12 @@
 .PlaylistCard .DeletePlaylistIcon:hover {
     color: red;
 }
+
+@media screen and (max-width: 768px) {
+    .titre {
+        font-size: 16px;
+    }
+    .PlaylistCard{
+        box-shadow: none;
+    }
+}
