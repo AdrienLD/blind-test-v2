@@ -15,14 +15,17 @@ export type AffichageState =
   | 'Question-Answered'
   | 'Question-Reponse'
   | 'Question-Chargement'
+  | 'Question-Reponse-Simple'
 
 export const QUESTION_LOADING: AffichageState   = 'Question-Loading'
 export const QUESTION_PLAYING: AffichageState   = 'Question-Playing'
 export const QUESTION_ANSWERED: AffichageState  = 'Question-Answered'
 export const QUESTION_REPONSE: AffichageState   = 'Question-Reponse'
 export const QUESTION_CHARGEMENT: AffichageState   = 'Question-Chargement'
+export const QUESTION_REPONSE_SIMPLE: AffichageState = 'Question-Reponse-Simple'
 
 export type SetAffichage = React.Dispatch<React.SetStateAction<AffichageState>>
+export type SetReponse = React.Dispatch<React.SetStateAction<boolean>>
 
 export function parseLyrics(lrc: string): Lyrics[] {
   const lines = lrc.split('\n')
@@ -117,7 +120,7 @@ function PLParoles() {
     const shouldTransform = (
       (isPrimary && affichagesuivant === -1)
     || (!isPrimary && affichagesuivant === relativeIndex - 1)
-    )
+    ) && affichage !== QUESTION_REPONSE_SIMPLE
 
     let displayText = shouldTransform ? transformString(words) : words
 
@@ -134,7 +137,7 @@ function PLParoles() {
 
   React.useEffect(( ) => {
     const updateLyrics = async () => {
-      
+      console.log('updateLyrics', affichagesuivant, position, parolesActuelles.length)
       controllerRef.current.abort()
       controllerRef.current = new AbortController()
       const signal = controllerRef.current.signal
@@ -150,7 +153,7 @@ function PLParoles() {
       )
 
       const delay = nextLyric.startTimeMs - currLyric.startTimeMs - (affichagesuivant === 0 ? 200 : 0)
-      if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE){
+      if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE) {
         await cancelableSleep(delay, signal)
         if (signal.aborted) return
 
@@ -158,7 +161,7 @@ function PLParoles() {
         setPosition(p => p + 1)
       } 
     }
-    if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE) updateLyrics()
+    if (affichage === QUESTION_PLAYING || affichage === QUESTION_REPONSE || affichage === QUESTION_REPONSE_SIMPLE ) updateLyrics()
       
     return () => controllerRef.current.abort()
   }, [ affichagesuivant, affichage ])
@@ -263,8 +266,12 @@ function PLParoles() {
           <button onClick={() => navigate('/ChoosePlaylist')}>Retour sélection</button>
         </div>
         <div className="content">
-          { (affichage !== QUESTION_REPONSE && affichage !== QUESTION_CHARGEMENT) && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} /> }
-          { affichage === QUESTION_REPONSE && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX} /> }
+          { (affichage !== QUESTION_REPONSE && affichage !== QUESTION_CHARGEMENT) 
+          && <AffichageQuestion musique={receivedData[musiqueActuelle]} affichage={affichage} setAffichage={setAffichage} paroles={lyricsJSX} />
+          }
+          { affichage === QUESTION_REPONSE
+            && <AffichageReponse musique={receivedData[musiqueActuelle]} setAffichage={setAffichage} paroles={lyricsJSX}/>
+          }
         </div> </>
       }
     </div>
