@@ -65,3 +65,59 @@ h2{
 a{
   text-decoration: none;
 }
+
+.App {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.description{
+  margin-top: 100px;
+  font-size: 20px;
+  text-align: justify;
+  width: 70%;
+  overflow: auto;
+}
+
+.description img{
+  width: 110px
+}
+
+.logosmusique{
+  display: flex;
+  justify-content: space-between;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.logosmusique img{
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  .logo{
+    height: 50px;
+    z-index: 200;
+  }
+
+  .content{
+    margin-top: 60px;
+  }
+
+  h2{
+    font-size: 20px;
+    z-index: 200;
+  }
+
+  .description{
+    font-size: 12px;
+    margin-top: 40px;
+    width: 90%;
+  }
+
+  .logosmusique{
+    width: 100%;
+  }
+  
+}

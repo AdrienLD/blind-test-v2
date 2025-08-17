@@ -213,9 +213,6 @@ const PlaylistSelection: React.FC = () => {
 
   return (
     <div className='PlaylistSelection'>
-      <h2>
-                Choisissez les playlists que vous voulez avoir dans votre BlindTest
-      </h2>
       { 
         User && <div className='UserInfos' onClick={() => changeAccount()}>
           <img src={User.images[0]?.url ?? '/images/S.png'} 

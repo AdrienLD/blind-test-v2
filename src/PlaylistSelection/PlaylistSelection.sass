@@ -154,3 +154,92 @@
         color: #666
         margin-top: 8px
 
+@media (max-width: 768px)
+  .PlaylistSelection
+    .listPlaylists
+      flex-direction: column
+      margin-top: 40px
+
+      .catalogue,
+      .panneaudroite
+        position: static
+        width: 90%
+        margin: 0 auto
+        left: unset
+        right: unset
+
+      .catalogue
+        display: flex
+        overflow: auto
+        padding: 0 10px
+        gap: 10px
+        position: fixed
+        z-index: 200
+        left: 50%
+        transform: translateX(-50%)
+        background-image: inherit
+        background: inherit
+
+      .PlaylistsPossibles
+        width: auto
+        margin: 0 1px
+        padding: 0 20px
+        margin-top: 60px
+        overflow-x: hidden
+        overflow-y: scroll
+        max-height:372px
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr))
+
+      .panneaudroite
+        .Selection
+          position: fixed
+          left: 50%
+          transform: translateX(-50%)
+          width: 90%
+          height: 250px
+          bottom: 60px
+          top: unset
+          .Carte_Selection
+            font-size: 20px
+          .cartesSelectionnees
+            margin: 10px
+          .Validations 
+            flex-direction: row
+            justify-content: center
+            button
+              font-size: 12px
+          
+
+
+      .panneaudroite .Start
+        font-size: 30px
+        position: fixed
+        width: 90%
+        left: 50%
+        transform: translateX(-50%)
+        bottom: 10px
+
+
+      .UserPlaylist
+        position: static
+        white-space: nowrap
+        height: auto
+
+
+.UserInfos
+    position: fixed
+    top: 0
+    right: 0
+    width: auto
+    background: none
+    box-shadow: none
+    justify-content: flex-end
+    z-index: 200
+
+    .UserText
+      display: none
+
+    .UserImage
+      width: 50px
+      height: 50px
+

@@ -1,5 +1,4 @@
 import React from 'react'
-import './App.css'
 import { authentificate } from './server/Playlist'
 
 function App() {
