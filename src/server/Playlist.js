@@ -10,8 +10,8 @@ export const playlist = [
   [ 'Français' , [ 'Hits', 'Rock', 'Rap', 'Variétée' ] ]
 ]
 
-const API_URL = process.env.REACT_APP_API_URL 
-const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI
+const API_URL = import.meta.env.VITE_API_URL
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI
 
 export const playlistUtilisateur = [
   []
@@ -253,7 +253,7 @@ export const authentificate = (add) => {
     'user-library-read' // Accès à la bibliothèque musicale de l'utilisateur
   ]
 
-  const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
+  const CLIENT_ID = import.meta.env.VITE_CLIENT_ID
 
   console.log('CLIENT_ID', CLIENT_ID, `redirect_uri=${encodeURIComponent(REDIRECT_URI)}${add}`)
 

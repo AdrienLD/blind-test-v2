@@ -10,7 +10,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/node": "^16.18.39",
+    "@types/node": "^20.11.30",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "cookie-parser": "^1.4.6",
@@ -20,27 +20,18 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.2",
-    "react-scripts": "5.0.1",
     "sass": "^1.70.0",
-    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "prod": "serve -s build",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "prod": "serve -s dist",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 0.0.0.0",
     "start-server": "node server/express.js",
     "start-both": "concurrently \"npm start\"  \"npm run start-server\"",
-    "start-both-prod": "concurrently \"serve -s build\" \"npm run start-server\"",
+    "start-both-prod": "concurrently \"serve -s dist\" \"npm run start-server\"",
     "update-images": "node src/Components/updateImages.js"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -58,10 +49,13 @@
     "@types/crypto-js": "^4.2.2",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^8.2.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.1",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "typescript": "^6.0.3",
+    "vite": "^5.4.11"
   },
   "type": "module"
 }
